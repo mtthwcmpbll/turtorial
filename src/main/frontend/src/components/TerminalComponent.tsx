@@ -67,16 +67,22 @@ export default function TerminalComponent() {
             }
         });
 
-        const handleResize = () => {
-            console.log("Resizing terminal");
-            fitAddon.fit();
-        };
-        window.addEventListener('resize', handleResize);
+        // Use ResizeObserver to fit terminal when container resizes
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(() => {
+                if (term) {
+                    fitAddon.fit();
+                }
+            });
+        });
+
+        if (terminalRef.current) {
+            resizeObserver.observe(terminalRef.current);
+        }
 
         // Force fit after slight delay
         setTimeout(() => {
             fitAddon.fit();
-            console.log("Initial fit performed");
         }, 100);
 
         // Custom event to send text to terminal programmatically
@@ -90,7 +96,7 @@ export default function TerminalComponent() {
         window.addEventListener('terminal:input', handleInput);
 
         return () => {
-            window.removeEventListener('resize', handleResize);
+            resizeObserver.disconnect();
             window.removeEventListener('terminal:input', handleInput);
             ws.close();
             term.dispose();

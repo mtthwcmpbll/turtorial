@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import TerminalComponent from '../components/TerminalComponent';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
-import * as Separator from '@radix-ui/react-separator';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -77,39 +76,39 @@ export default function LessonView() {
         setCurrentStepIndex(index);
     }
 
-    if (loading) return <div className="p-10 text-black flex items-center justify-center h-screen bg-white">Loading lesson...</div>;
-    if (!lesson) return <div className="p-10 text-black flex items-center justify-center h-screen bg-white">Lesson not found.</div>;
+    if (loading) return <div className="p-10 text-foreground flex items-center justify-center h-screen bg-background">Loading lesson...</div>;
+    if (!lesson) return <div className="p-10 text-foreground flex items-center justify-center h-screen bg-background">Lesson not found.</div>;
 
     const currentStep = lesson.steps[currentStepIndex];
 
     return (
-        <div className="flex flex-col h-screen w-screen bg-white text-black overflow-hidden font-sans">
+        <div className="flex flex-col h-screen w-screen bg-background text-foreground overflow-hidden font-sans">
             {/* 1. Global Header */}
-            <header className="h-14 flex items-center px-6 border-b border-gray-200 bg-white flex-shrink-0 z-10">
+            <header className="h-14 flex items-center px-6 border-b border-border bg-background flex-shrink-0 z-10">
                 <div className="flex items-center space-x-4">
                     <button
                         onClick={() => navigate('/')}
-                        className="text-gray-500 hover:text-black transition-colors p-1 rounded-md hover:bg-gray-100"
+                        className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </button>
-                    <span className="text-gray-300">/</span>
-                    <h1 className="text-lg font-bold text-black">{lesson.title}</h1>
+                    <span className="text-muted-foreground">/</span>
+                    <h1 className="text-lg font-bold text-foreground">{lesson.title}</h1>
                 </div>
             </header>
 
             {/* 2. Main Workspace */}
             <div className="flex-1 min-h-0 relative">
-                <PanelGroup direction="horizontal">
+                <PanelGroup orientation="horizontal" className="h-full w-full">
                     {/* Left Panel: Steps & Content */}
-                    <Panel defaultSize={50} minSize={20} maxSize={80} className="flex flex-col min-w-0">
+                    <Panel defaultSize="50" minSize="20" maxSize="80" className="flex flex-col min-w-0">
 
                         {/* Step Header */}
-                        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                        <div className="h-16 flex items-center justify-between px-6 border-b border-border bg-muted/40 flex-shrink-0">
                             <div className="flex items-center space-x-4">
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Step {currentStepIndex + 1} of {lesson.steps.length}</span>
-                                    <h2 className="text-xl font-bold text-black">{currentStep.title}</h2>
+                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Step {currentStepIndex + 1} of {lesson.steps.length}</span>
+                                    <h2 className="text-xl font-bold text-foreground">{currentStep.title}</h2>
                                 </div>
                             </div>
 
@@ -117,20 +116,24 @@ export default function LessonView() {
                                 <button
                                     onClick={prevStep}
                                     disabled={currentStepIndex === 0}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${currentStepIndex === 0
-                                            ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                                            : 'border-gray-300 text-gray-700 hover:text-black hover:bg-gray-100'
-                                        }`}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-md text-sm font-medium transition-colors border",
+                                        currentStepIndex === 0
+                                            ? "border-border text-muted-foreground cursor-not-allowed"
+                                            : "border-input text-foreground hover:bg-accent hover:text-accent-foreground"
+                                    )}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={nextStep}
                                     disabled={currentStepIndex === lesson.steps.length - 1}
-                                    className={`px-4 py-1.5 rounded-md text-sm font-bold transition-transform active:scale-95 border ${currentStepIndex === lesson.steps.length - 1
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-                                            : 'bg-black border-black text-white hover:bg-gray-800 shadow-sm'
-                                        }`}
+                                    className={cn(
+                                        "px-4 py-1.5 rounded-md text-sm font-bold transition-transform active:scale-95 border",
+                                        currentStepIndex === lesson.steps.length - 1
+                                            ? "bg-muted border-border text-muted-foreground cursor-not-allowed"
+                                            : "bg-primary border-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                                    )}
                                 >
                                     {currentStepIndex === lesson.steps.length - 1 ? 'Finish' : 'Next Step'}
                                 </button>
@@ -140,9 +143,9 @@ export default function LessonView() {
                         {/* Inner Body: Sidebar + Content */}
                         <div className="flex flex-1 min-h-0">
                             {/* Sidebar */}
-                            <div className="w-64 flex-shrink-0 border-r border-gray-200 bg-gray-50 flex flex-col">
+                            <div className="w-64 flex-shrink-0 border-r border-border bg-muted/20 flex flex-col">
                                 <ScrollArea.Root className="w-full h-full overflow-hidden">
-                                    <ScrollArea.Viewport className="w-full h-full p-4 space-y-2">
+                                    <ScrollArea.Viewport className="w-full h-full p-4 space-y-2 *:!block overscroll-contain">
                                         {lesson.steps.map((step, index) => {
                                             const isActive = index === currentStepIndex;
                                             const isCompleted = completedSteps.has(index);
@@ -152,16 +155,16 @@ export default function LessonView() {
                                                     onClick={() => jumpToStep(index)}
                                                     className={cn(
                                                         "w-full text-left p-2.5 rounded-md flex items-center group transition-colors",
-                                                        isActive ? 'bg-gray-200 text-black font-medium' : 'hover:bg-gray-100 text-gray-600 hover:text-black'
+                                                        isActive ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground'
                                                     )}
                                                 >
                                                     <div className={cn(
                                                         "mr-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border transition-colors",
                                                         isCompleted
-                                                            ? 'bg-green-500 border-green-500 text-white'
+                                                            ? 'bg-success border-success text-success-foreground'
                                                             : isActive
-                                                                ? 'border-black text-black'
-                                                                : 'border-gray-300 text-gray-400 group-hover:border-gray-400'
+                                                                ? 'border-primary text-primary'
+                                                                : 'border-border text-muted-foreground group-hover:border-foreground/50'
                                                     )}>
                                                         {isCompleted ? (
                                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
@@ -169,36 +172,36 @@ export default function LessonView() {
                                                             <span className="text-[10px] font-mono leading-none">{index + 1}</span>
                                                         )}
                                                     </div>
-                                                    <span className={cn("truncate text-sm", isActive ? 'text-black' : '')}>
+                                                    <span className={cn("truncate text-sm", isActive ? 'text-foreground' : '')}>
                                                         {step.title || `Step ${index + 1}`}
                                                     </span>
                                                 </button>
                                             );
                                         })}
                                     </ScrollArea.Viewport>
-                                    <ScrollArea.Scrollbar orientation="vertical" className="flex select-none touch-none p-0.5 bg-gray-100 transition-colors duration-[160ms] ease-out hover:bg-gray-200 w-2">
-                                        <ScrollArea.Thumb className="flex-1 bg-gray-300 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                                    <ScrollArea.Scrollbar orientation="vertical" className="flex select-none touch-none p-0.5 bg-muted transition-colors duration-[160ms] ease-out hover:bg-muted/80 w-2">
+                                        <ScrollArea.Thumb className="flex-1 bg-border rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                                     </ScrollArea.Scrollbar>
                                 </ScrollArea.Root>
                             </div>
 
                             {/* Content */}
-                            <div className="flex-1 flex flex-col min-w-0 bg-white">
+                            <div className="flex-1 flex flex-col min-w-0 bg-background">
                                 <ScrollArea.Root className="w-full h-full overflow-hidden">
-                                    <ScrollArea.Viewport className="w-full h-full p-8">
-                                        <div className="prose max-w-none">
+                                    <ScrollArea.Viewport className="w-full h-full p-8 *:!block overscroll-contain">
+                                        <div className="prose max-w-none w-full min-w-0 break-words text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:overflow-x-auto">
                                             <MarkdownRenderer content={currentStep.content} />
 
                                             {currentStep.runCommand && (
-                                                <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">Try it out</h3>
+                                                <div className="mt-8 p-4 bg-muted/40 rounded-lg border border-border">
+                                                    <h3 className="text-sm font-semibold text-muted-foreground mb-2 uppercase">Try it out</h3>
                                                     <div className="flex items-center space-x-4">
-                                                        <code className="flex-1 bg-gray-800 p-3 rounded font-mono text-sm text-green-400">
+                                                        <code className="flex-1 bg-primary p-3 rounded font-mono text-sm text-primary-foreground border border-border/20">
                                                             {currentStep.runCommand}
                                                         </code>
                                                         <button
                                                             onClick={() => runCommand(currentStep.runCommand!)}
-                                                            className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded font-medium transition-colors shadow-sm active:translate-y-0.5"
+                                                            className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded font-medium transition-colors shadow-sm active:translate-y-0.5"
                                                         >
                                                             Run
                                                         </button>
@@ -207,8 +210,8 @@ export default function LessonView() {
                                             )}
                                         </div>
                                     </ScrollArea.Viewport>
-                                    <ScrollArea.Scrollbar orientation="vertical" className="flex select-none touch-none p-0.5 bg-gray-100 transition-colors duration-[160ms] ease-out hover:bg-gray-200 w-2.5">
-                                        <ScrollArea.Thumb className="flex-1 bg-gray-300 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                                    <ScrollArea.Scrollbar orientation="vertical" className="flex select-none touch-none p-0.5 bg-muted transition-colors duration-[160ms] ease-out hover:bg-muted/80 w-2.5">
+                                        <ScrollArea.Thumb className="flex-1 bg-border rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                                     </ScrollArea.Scrollbar>
                                 </ScrollArea.Root>
                             </div>
@@ -216,13 +219,15 @@ export default function LessonView() {
                     </Panel>
 
                     {/* Resizer */}
-                    <PanelResizeHandle className="w-1 bg-gray-200 hover:bg-blue-400 cursor-col-resize flex items-center justify-center transition-colors data-[resize-handle-state=drag]:bg-blue-500">
-                        <div className="h-4 w-0.5 bg-gray-400/50 rounded-full"></div>
+                    <PanelResizeHandle className="w-1 bg-border hover:bg-primary/50 cursor-col-resize flex items-center justify-center transition-colors data-[resize-handle-state=drag]:bg-primary">
+                        <div className="h-4 w-0.5 bg-border rounded-full"></div>
                     </PanelResizeHandle>
 
                     {/* Right Panel: Terminal */}
-                    <Panel className="flex flex-col min-w-[300px] border-l border-gray-200 bg-black">
-                        <TerminalComponent />
+                    <Panel className="flex flex-col min-w-[300px] border-l border-border bg-[#1e1e1e]">
+                        <div className="flex-1 min-h-0">
+                            <TerminalComponent />
+                        </div>
                     </Panel>
                 </PanelGroup>
             </div>

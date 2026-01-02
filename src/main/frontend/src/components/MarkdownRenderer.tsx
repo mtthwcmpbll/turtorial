@@ -9,11 +9,17 @@ interface MarkdownRendererProps {
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     return (
-        <div className="prose max-w-none p-6">
+        <div className="w-full min-w-0 break-words">
             <Markdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
                 components={{
+                    // Custom rendering for pre tags to ensure scrolling
+                    pre: ({ children, ...props }) => (
+                        <pre {...props} className="overflow-x-auto w-full max-w-full rounded-sm">
+                            {children}
+                        </pre>
+                    ),
                     // Custom rendering for code blocks
                     code(props) {
                         const { children, className, ...rest } = props
@@ -40,7 +46,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                                     <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={() => window.dispatchEvent(new CustomEvent('terminal:input', { detail: codeContent + '\r' }))}
-                                            className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded shadow-md flex items-center space-x-1"
+                                            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded shadow-md flex items-center space-x-1"
                                             title="Run in Terminal"
                                         >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
