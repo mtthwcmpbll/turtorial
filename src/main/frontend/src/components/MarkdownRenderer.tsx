@@ -9,7 +9,7 @@ interface MarkdownRendererProps {
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     return (
-        <div className="prose prose-invert max-w-none p-6">
+        <div className="prose max-w-none p-6">
             <Markdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
