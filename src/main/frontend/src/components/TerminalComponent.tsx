@@ -30,38 +30,54 @@ export default function TerminalComponent() {
 
         // Connect WebSocket
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        // Use relative path which will be proxied or direct if port matches
-        // But in dev, Vite is 5173, Boot is 8080. 
-        // We configured proxy? Not yet. 
-        // We will assume /term is proxied.
-        const host = window.location.host; 
+        // Use relative path which will be proxied (in dev) or direct (in prod)
+        const host = window.location.host;
         const wsUrl = `${protocol}//${host}/term`;
-        
+
         console.log("Connecting to terminal: " + wsUrl);
 
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
 
         ws.onopen = () => {
+            console.log("WS Connected");
             term.writeln('\x1b[32mConnected to terminal backend...\x1b[0m\r\n');
         };
 
+        ws.onerror = (e) => {
+            console.error("WS Error", e);
+            term.writeln('\r\n\x1b[31mConnection Error.\x1b[0m');
+        };
+
         ws.onmessage = (event) => {
+            console.log("WS Message received (length):", event.data.length);
             term.write(event.data);
         };
 
-        ws.onclose = () => {
+        ws.onclose = (e) => {
+            console.log("WS Closed", e.code, e.reason);
             term.writeln('\r\n\x1b[31mConnection closed.\x1b[0m');
         };
 
         term.onData((data) => {
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(data);
+            } else {
+                console.warn("WS not open, cannot send data");
             }
         });
 
-        const handleResize = () => fitAddon.fit();
+        const handleResize = () => {
+            console.log("Resizing terminal");
+            fitAddon.fit();
+        };
         window.addEventListener('resize', handleResize);
+
+        // Force fit after slight delay
+        setTimeout(() => {
+            fitAddon.fit();
+            console.log("Initial fit performed");
+        }, 100);
 
         // Custom event to send text to terminal programmatically
         const handleInput = (e: Event) => {
@@ -83,7 +99,7 @@ export default function TerminalComponent() {
 
     return (
         <div className="h-full w-full p-6 bg-[#1e1e1e] box-border relative overflow-hidden">
-             {/* Wrapper to ensure full height for xterm */}
+            {/* Wrapper to ensure full height for xterm */}
             <div ref={terminalRef} className="h-full w-full" style={{ minHeight: '400px' }} />
         </div>
     );

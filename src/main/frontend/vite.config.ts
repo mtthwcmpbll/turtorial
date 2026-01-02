@@ -9,14 +9,15 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    host: '127.0.0.1',
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://127.0.0.1:8080',
         changeOrigin: true,
         secure: false
       },
       '/term': {
-        target: 'ws://localhost:8080',
+        target: 'http://127.0.0.1:8080',
         ws: true,
         changeOrigin: true,
         secure: false

@@ -22,11 +22,16 @@ import java.util.concurrent.Executors;
 @Component
 public class TerminalSocketHandler extends TextWebSocketHandler {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TerminalSocketHandler.class);
+
     private final Map<String, PtyProcess> sessions = new ConcurrentHashMap<>();
     private final Map<String, ExecutorService> sessionThreads = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        log.info("WebSocket connection established: " + session.getId());
+        long start = System.nanoTime();
+
         String[] cmd = { "/bin/sh", "-l" };
         Map<String, String> env = new HashMap<>(System.getenv());
         env.put("TERM", "xterm");
@@ -35,32 +40,45 @@ public class TerminalSocketHandler extends TextWebSocketHandler {
         String ptyLibPath = System.getProperty("user.home") + "/.pty4j";
         System.setProperty("pty4j.tmpdir", ptyLibPath);
 
-        PtyProcess process = new PtyProcessBuilder(cmd)
-                .setEnvironment(env)
-                .start();
+        try {
+            log.info("Starting PTY process for session: " + session.getId());
+            PtyProcess process = new PtyProcessBuilder(cmd)
+                    .setEnvironment(env)
+                    .start();
 
-        sessions.put(session.getId(), process);
+            long ptyStartDuration = (System.nanoTime() - start) / 1_000_000;
+            log.info("PTY process started in {} ms for session: {}", ptyStartDuration, session.getId());
 
-        // Initial window size
-        process.setWinSize(new WinSize(80, 24));
+            sessions.put(session.getId(), process);
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        sessionThreads.put(session.getId(), executor);
+            // Initial window size
+            process.setWinSize(new WinSize(80, 24));
 
-        executor.submit(() -> {
-            InputStream is = process.getInputStream();
-            byte[] buffer = new byte[1024];
-            int read;
-            try {
-                while (process.isAlive() && (read = is.read(buffer)) != -1) {
-                    if (session.isOpen()) {
-                        session.sendMessage(new TextMessage(new String(buffer, 0, read, StandardCharsets.UTF_8)));
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            sessionThreads.put(session.getId(), executor);
+
+            executor.submit(() -> {
+                InputStream is = process.getInputStream();
+                byte[] buffer = new byte[1024];
+                int read;
+                try {
+                    while (process.isAlive() && (read = is.read(buffer)) != -1) {
+                        if (session.isOpen()) {
+                            // optimize logging: don't log every chunk unless debugging
+                            // log.debug("Sent " + read + " bytes to " + session.getId());
+                            session.sendMessage(new TextMessage(new String(buffer, 0, read, StandardCharsets.UTF_8)));
+                        }
                     }
+                } catch (IOException e) {
+                    log.error("Error reading from PTY for session " + session.getId(), e);
+                } finally {
+                    log.info("PTY output stream closed for session " + session.getId());
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+            });
+        } catch (Exception e) {
+            log.error("Failed to start PTY process within " + ((System.nanoTime() - start) / 1_000_000) + " ms", e);
+            session.close(CloseStatus.SERVER_ERROR);
+        }
     }
 
     @Override
@@ -70,11 +88,14 @@ public class TerminalSocketHandler extends TextWebSocketHandler {
             OutputStream os = process.getOutputStream();
             os.write(message.getPayload().getBytes(StandardCharsets.UTF_8));
             os.flush();
+        } else {
+            log.warn("Received message but PTY is dead for session: " + session.getId());
         }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        log.info("WebSocket connection closed: " + session.getId());
         PtyProcess process = sessions.remove(session.getId());
         if (process != null && process.isAlive()) {
             process.destroy();
