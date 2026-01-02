@@ -1,0 +1,49 @@
+---
+title: Setup
+---
+# Setup
+
+> Note:  We'll use a couple of conventions in this document to refer to some common directories. `$WORKSHOP` will refer to the root of this repository. `$WORKSPACE` will refer to the directory you're cloning repos into and running `mod` commands against. `$PROJECTS` refers to a directory outside of `$WORKSPACE` where you can clone other repositories to work on separately. If you want to make this simpler and run commands copied directly from this workshop guide, you can use `export WORKSPACE=~/workspaces/migration_workshop`, `export WORKSHOP=~/projects/moderne-migration-practice`, and `export PROJECTS=~/projects` in your shell session. Replace the values of these variables with their real locations on your hard drive.
+
+Let's start by using the Moderne CLI to clone all of our example repositories into an empty directory:
+
+```bash
+# Navigate to your empty workspace (make sure you've set `$WORKSPACE` in your shell previously, or just replace it with the actual place you want to go)
+cd $WORKSPACE
+
+# Clone all of our example repositories into the workspace with their source code so that we can apply suggested changes from recipes
+# We will use this environment variable explicitly going forward so you can run `mod` commands from anywhere, but if you navigate to the `$WORKSPACE` path with the previous command and run `mod` from there, you can replace `$WORKSPACE` with `.` for future `mod` commands
+mod git sync csv $WORKSPACE $WORKSHOP/repos.csv --with-sources
+```
+
+This `repos.csv` lists all of our example repositories, and you can view the final workspace structure to see that you have a directory for the GitHub org (or user) with the repositories inside:
+
+```bash
+tree -d $WORKSPACE. -L 3
+```
+
+This repository includes some helper scripts to run commands like testing, releasing, and doing common git actions across your repositories. The software development lifecycle of building and releasing new versions of these repositories is usually handled by your existing process outside of OpenRewrite and Moderne, but in this workshop you can simulate a release with the included `release.sh` script. Since all of our projects currently depend on a release version 1.0.0 of each other and those don't exist yet, go ahead and run a first release to get everything building:
+
+```bash
+# Release
+$WORKSHOP/release.sh
+```
+
+This will automatically install the current non-SNAPSHOT version of each repository into your local Maven cache. It will then bump the project's version to the next available minor SNAPSHOT version, ready for you to make more changes.
+
+Now we can build our first Lossless Semantic Trees (LSTs) so we can run OpenRewrite recipes on the synced repositories. This command may take a few minutes to run as it compiles the projects and builds the LSTs for each project:
+
+```bash
+# Build an LST for each project
+mod build $WORKSPACE
+```
+
+To make sure we have all the OpenRewrite recipes we will need for this workshop, we can install the following recipe artifacts:
+
+```bash
+# For a deterministic workshop, this clears any installed recipes first
+mod config recipes delete
+
+# Install the necessary recipes for this workshop from the public Maven repository
+mod config recipes jar install io.moderne.recipe:rewrite-spring:0.19.0 org.openrewrite.recipe:rewrite-migrate-java:3.24.0 org.openrewrite.recipe:rewrite-java-dependencies:1.48.0 org.openrewrite:rewrite-java:8.69.0 org.openrewrite:rewrite-maven:8.69.0 io.moderne.recipe:rewrite-devcenter:1.13.1 org.openrewrite.recipe:rewrite-spring:6.21.0 org.openrewrite.recipe:rewrite-testing-frameworks:3.24.0
+```
