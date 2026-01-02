@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MarkdownRenderer from '../components/MarkdownRenderer';
 import TerminalComponent from '../components/TerminalComponent';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import * as ScrollArea from '@radix-ui/react-scroll-area';
+import * as Separator from '@radix-ui/react-separator';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// Utility for Tailwind class merging
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 interface Step {
     id: string;
@@ -24,10 +34,6 @@ export default function LessonView() {
     const [loading, setLoading] = useState(true);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-
-    // Resize State
-    const [leftPanelWidth, setLeftPanelWidth] = useState(50); // Percentage
-    const [isResizing, setIsResizing] = useState(false);
 
     useEffect(() => {
         if (lessonId) {
@@ -71,41 +77,13 @@ export default function LessonView() {
         setCurrentStepIndex(index);
     }
 
-    // Resize Handlers
-    const startResizing = (mouseDownEvent: React.MouseEvent) => {
-        setIsResizing(true);
-        mouseDownEvent.preventDefault();
-    };
-
-    const stopResizing = () => {
-        setIsResizing(false);
-    };
-
-    const resize = (mouseMoveEvent: MouseEvent) => {
-        if (isResizing) {
-            const newWidth = (mouseMoveEvent.clientX / window.innerWidth) * 100;
-            if (newWidth > 20 && newWidth < 80) { // Min/Max constraints
-                setLeftPanelWidth(newWidth);
-            }
-        }
-    };
-
-    useEffect(() => {
-        window.addEventListener("mousemove", resize);
-        window.addEventListener("mouseup", stopResizing);
-        return () => {
-            window.removeEventListener("mousemove", resize);
-            window.removeEventListener("mouseup", stopResizing);
-        };
-    }, [isResizing]);
-
     if (loading) return <div className="p-10 text-black flex items-center justify-center h-screen bg-white">Loading lesson...</div>;
     if (!lesson) return <div className="p-10 text-black flex items-center justify-center h-screen bg-white">Lesson not found.</div>;
 
     const currentStep = lesson.steps[currentStepIndex];
 
     return (
-        <div className="flex flex-col h-screen w-screen bg-white text-black overflow-hidden font-sans select-none">
+        <div className="flex flex-col h-screen w-screen bg-white text-black overflow-hidden font-sans">
             {/* 1. Global Header */}
             <header className="h-14 flex items-center px-6 border-b border-gray-200 bg-white flex-shrink-0 z-10">
                 <div className="flex items-center space-x-4">
@@ -121,130 +99,132 @@ export default function LessonView() {
             </header>
 
             {/* 2. Main Workspace */}
-            <div className="flex flex-1 min-h-0 relative">
-                {/* Left Block: Steps & Content */}
-                <div
-                    className="flex flex-col min-w-0"
-                    style={{ width: `${leftPanelWidth}%` }}
-                >
+            <div className="flex-1 min-h-0 relative">
+                <PanelGroup direction="horizontal">
+                    {/* Left Panel: Steps & Content */}
+                    <Panel defaultSize={50} minSize={20} maxSize={80} className="flex flex-col min-w-0">
 
-                    {/* Step Header */}
-                    <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-                        <div className="flex items-center space-x-4">
-                            <div className="flex flex-col">
-                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Step {currentStepIndex + 1} of {lesson.steps.length}</span>
-                                <h2 className="text-xl font-bold text-black">{currentStep.title}</h2>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                            <button
-                                onClick={prevStep}
-                                disabled={currentStepIndex === 0}
-                                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${currentStepIndex === 0
-                                        ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                                        : 'border-gray-300 text-gray-700 hover:text-black hover:bg-gray-100'
-                                    }`}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={nextStep}
-                                disabled={currentStepIndex === lesson.steps.length - 1}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-transform active:scale-95 border ${currentStepIndex === lesson.steps.length - 1
-                                        ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'bg-black border-black text-white hover:bg-gray-800 shadow-sm'
-                                    }`}
-                            >
-                                {currentStepIndex === lesson.steps.length - 1 ? 'Finish' : 'Next Step'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Inner Body */}
-                    <div className="flex flex-1 min-h-0">
-                        {/* Sidebar */}
-                        <div className="w-64 flex-shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto">
-                            <div className="p-4 space-y-2">
-                                {lesson.steps.map((step, index) => {
-                                    const isActive = index === currentStepIndex;
-                                    const isCompleted = completedSteps.has(index);
-                                    return (
-                                        <button
-                                            key={step.id}
-                                            onClick={() => jumpToStep(index)}
-                                            className={`w-full text-left p-2.5 rounded-md flex items-center group transition-colors ${isActive
-                                                    ? 'bg-gray-200 text-black font-medium'
-                                                    : 'hover:bg-gray-100 text-gray-600 hover:text-black'
-                                                }`}
-                                        >
-                                            <div className={`mr-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${isCompleted
-                                                    ? 'bg-green-500 border-green-500 text-white'
-                                                    : isActive
-                                                        ? 'border-black text-black'
-                                                        : 'border-gray-300 text-gray-400 group-hover:border-gray-400'
-                                                }`}>
-                                                {isCompleted ? (
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                                                ) : (
-                                                    <span className="text-[10px] font-mono leading-none">{index + 1}</span>
-                                                )}
-                                            </div>
-                                            <span className={`truncate text-sm ${isActive ? 'text-black' : ''}`}>
-                                                {step.title || `Step ${index + 1}`}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 overflow-y-auto p-8 prose max-w-none bg-white">
-                            <MarkdownRenderer content={currentStep.content} />
-
-                            {currentStep.runCommand && (
-                                <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">Try it out</h3>
-                                    <div className="flex items-center space-x-4">
-                                        <code className="flex-1 bg-gray-800 p-3 rounded font-mono text-sm text-green-400">
-                                            {currentStep.runCommand}
-                                        </code>
-                                        <button
-                                            onClick={() => runCommand(currentStep.runCommand!)}
-                                            className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded font-medium transition-colors shadow-sm active:translate-y-0.5"
-                                        >
-                                            Run
-                                        </button>
-                                    </div>
+                        {/* Step Header */}
+                        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                            <div className="flex items-center space-x-4">
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Step {currentStepIndex + 1} of {lesson.steps.length}</span>
+                                    <h2 className="text-xl font-bold text-black">{currentStep.title}</h2>
                                 </div>
-                            )}
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={prevStep}
+                                    disabled={currentStepIndex === 0}
+                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${currentStepIndex === 0
+                                            ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                                            : 'border-gray-300 text-gray-700 hover:text-black hover:bg-gray-100'
+                                        }`}
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    onClick={nextStep}
+                                    disabled={currentStepIndex === lesson.steps.length - 1}
+                                    className={`px-4 py-1.5 rounded-md text-sm font-bold transition-transform active:scale-95 border ${currentStepIndex === lesson.steps.length - 1
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                                            : 'bg-black border-black text-white hover:bg-gray-800 shadow-sm'
+                                        }`}
+                                >
+                                    {currentStepIndex === lesson.steps.length - 1 ? 'Finish' : 'Next Step'}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Resizer Handle */}
-                <div
-                    className={`w-1 bg-gray-200 hover:bg-blue-400 cursor-col-resize z-20 flex items-center justify-center transition-colors ${isResizing ? 'bg-blue-500' : ''}`}
-                    onMouseDown={startResizing}
-                >
-                    <div className="h-4 w-0.5 bg-gray-400/50 rounded-full"></div>
-                </div>
+                        {/* Inner Body: Sidebar + Content */}
+                        <div className="flex flex-1 min-h-0">
+                            {/* Sidebar */}
+                            <div className="w-64 flex-shrink-0 border-r border-gray-200 bg-gray-50 flex flex-col">
+                                <ScrollArea.Root className="w-full h-full overflow-hidden">
+                                    <ScrollArea.Viewport className="w-full h-full p-4 space-y-2">
+                                        {lesson.steps.map((step, index) => {
+                                            const isActive = index === currentStepIndex;
+                                            const isCompleted = completedSteps.has(index);
+                                            return (
+                                                <button
+                                                    key={step.id}
+                                                    onClick={() => jumpToStep(index)}
+                                                    className={cn(
+                                                        "w-full text-left p-2.5 rounded-md flex items-center group transition-colors",
+                                                        isActive ? 'bg-gray-200 text-black font-medium' : 'hover:bg-gray-100 text-gray-600 hover:text-black'
+                                                    )}
+                                                >
+                                                    <div className={cn(
+                                                        "mr-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border transition-colors",
+                                                        isCompleted
+                                                            ? 'bg-green-500 border-green-500 text-white'
+                                                            : isActive
+                                                                ? 'border-black text-black'
+                                                                : 'border-gray-300 text-gray-400 group-hover:border-gray-400'
+                                                    )}>
+                                                        {isCompleted ? (
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                                                        ) : (
+                                                            <span className="text-[10px] font-mono leading-none">{index + 1}</span>
+                                                        )}
+                                                    </div>
+                                                    <span className={cn("truncate text-sm", isActive ? 'text-black' : '')}>
+                                                        {step.title || `Step ${index + 1}`}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </ScrollArea.Viewport>
+                                    <ScrollArea.Scrollbar orientation="vertical" className="flex select-none touch-none p-0.5 bg-gray-100 transition-colors duration-[160ms] ease-out hover:bg-gray-200 w-2">
+                                        <ScrollArea.Thumb className="flex-1 bg-gray-300 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                                    </ScrollArea.Scrollbar>
+                                </ScrollArea.Root>
+                            </div>
 
-                {/* Right Block: Terminal */}
-                <div
-                    className="flex flex-col h-full bg-black border-l border-gray-200"
-                    style={{ width: `${100 - leftPanelWidth}%` }}
-                >
-                    <div className="flex-1 relative">
+                            {/* Content */}
+                            <div className="flex-1 flex flex-col min-w-0 bg-white">
+                                <ScrollArea.Root className="w-full h-full overflow-hidden">
+                                    <ScrollArea.Viewport className="w-full h-full p-8">
+                                        <div className="prose max-w-none">
+                                            <MarkdownRenderer content={currentStep.content} />
+
+                                            {currentStep.runCommand && (
+                                                <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 uppercase">Try it out</h3>
+                                                    <div className="flex items-center space-x-4">
+                                                        <code className="flex-1 bg-gray-800 p-3 rounded font-mono text-sm text-green-400">
+                                                            {currentStep.runCommand}
+                                                        </code>
+                                                        <button
+                                                            onClick={() => runCommand(currentStep.runCommand!)}
+                                                            className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded font-medium transition-colors shadow-sm active:translate-y-0.5"
+                                                        >
+                                                            Run
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </ScrollArea.Viewport>
+                                    <ScrollArea.Scrollbar orientation="vertical" className="flex select-none touch-none p-0.5 bg-gray-100 transition-colors duration-[160ms] ease-out hover:bg-gray-200 w-2.5">
+                                        <ScrollArea.Thumb className="flex-1 bg-gray-300 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                                    </ScrollArea.Scrollbar>
+                                </ScrollArea.Root>
+                            </div>
+                        </div>
+                    </Panel>
+
+                    {/* Resizer */}
+                    <PanelResizeHandle className="w-1 bg-gray-200 hover:bg-blue-400 cursor-col-resize flex items-center justify-center transition-colors data-[resize-handle-state=drag]:bg-blue-500">
+                        <div className="h-4 w-0.5 bg-gray-400/50 rounded-full"></div>
+                    </PanelResizeHandle>
+
+                    {/* Right Panel: Terminal */}
+                    <Panel className="flex flex-col min-w-[300px] border-l border-gray-200 bg-black">
                         <TerminalComponent />
-                    </div>
-                </div>
-
-                {/* Overlay while resizing to prevent iframe (or terminal) stealing mouse events */}
-                {isResizing && (
-                    <div className="absolute inset-0 z-50 bg-transparent cursor-col-resize"></div>
-                )}
+                    </Panel>
+                </PanelGroup>
             </div>
         </div>
     );
