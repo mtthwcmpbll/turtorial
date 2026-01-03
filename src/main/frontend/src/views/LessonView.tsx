@@ -189,7 +189,7 @@ export default function LessonView() {
                             <div className="flex-1 flex flex-col min-w-0 bg-background">
                                 <ScrollArea.Root className="w-full h-full overflow-hidden">
                                     <ScrollArea.Viewport className="w-full h-full p-8 *:!block overscroll-contain">
-                                        <div className="prose max-w-none w-full min-w-0 break-words text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:overflow-x-auto">
+                                        <div className="prose max-w-none w-full min-w-0 break-words text-foreground prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-code:text-primary prose-code:before:content-none prose-code:after:content-none prose-code:bg-muted/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:font-mono prose-code:font-normal prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:overflow-x-auto">
                                             <MarkdownRenderer content={currentStep.content} />
 
                                             {currentStep.runCommand && (

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
     --color-background: #ffffff;
@@ -16,20 +17,20 @@
     --color-border: #e4e4e7;
     --color-input: #e4e4e7;
 
-    --color-primary: #18181b;
-    --color-primary-foreground: #fafafa;
+    --color-primary: var(--color-blue-700);
+    --color-primary-foreground: var(--color-blue-50);
 
-    --color-secondary: #f4f4f5;
-    --color-secondary-foreground: #18181b;
+    --color-secondary: var(--color-blue-500);
+    --color-secondary-foreground: var(--color-blue-50);
 
     --color-accent: #f4f4f5;
     --color-accent-foreground: #18181b;
 
-    --color-destructive: #ef4444;
-    --color-destructive-foreground: #fafafa;
+    --color-destructive: var(--color-red-500);
+    --color-destructive-foreground: var(--color-red-50);
 
-    --color-success: #22c55e;
-    --color-success-foreground: #ffffff;
+    --color-success: var(--color-green-500);
+    --color-success-foreground: var(--color-green-50);
 
     /* Radius */
     --radius-sm: calc(0.5rem - 4px);
