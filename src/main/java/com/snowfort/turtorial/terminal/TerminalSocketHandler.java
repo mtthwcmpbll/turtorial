@@ -32,7 +32,7 @@ public class TerminalSocketHandler extends TextWebSocketHandler {
         log.info("WebSocket connection established: " + session.getId());
         long start = System.nanoTime();
 
-        String[] cmd = { "/bin/sh", "-l" };
+        String[] cmd = { "/bin/bash", "-l" };
         Map<String, String> env = new HashMap<>(System.getenv());
         env.put("TERM", "xterm");
 
