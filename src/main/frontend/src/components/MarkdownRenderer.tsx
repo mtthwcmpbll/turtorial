@@ -1,10 +1,13 @@
+import React from 'react';
 import Markdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import remarkDirective from 'remark-directive';
 import { visit } from 'unist-util-visit';
 import 'highlight.js/styles/github-dark.css';
-import React from 'react';
+
+import CodeBlock from './lesson/CodeBlock';
+import Admonition, { type AdmonitionType } from './lesson/Admonition';
 
 interface MarkdownRendererProps {
     content: string;
@@ -19,59 +22,12 @@ function remarkAdmonitions() {
                     const data = node.data || (node.data = {});
                     const tagName = 'div';
 
-                    // Define styles based on type
-                    let styles = "bg-muted text-foreground border-l-4 p-4 my-4 rounded-r relative";
-                    let borderColor = "border-primary";
-                    let icon = "ℹ️";
-
-                    switch (node.name) {
-                        case 'note':
-                            borderColor = "border-blue-500";
-                            styles = "bg-blue-50/50 text-blue-900 dark:text-blue-100 border-l-4 p-4 my-4 rounded-r relative";
-                            icon = "ℹ️";
-                            break;
-                        case 'tip':
-                            borderColor = "border-green-500";
-                            styles = "bg-green-50/50 text-green-900 dark:text-green-100 border-l-4 p-4 my-4 rounded-r relative";
-                            icon = "💡";
-                            break;
-                        case 'important':
-                            borderColor = "border-purple-500";
-                            styles = "bg-purple-50/50 text-purple-900 dark:text-purple-100 border-l-4 p-4 my-4 rounded-r relative";
-                            icon = "📢";
-                            break;
-                        case 'warning':
-                            borderColor = "border-yellow-500";
-                            styles = "bg-yellow-50/50 text-yellow-900 dark:text-yellow-100 border-l-4 p-4 my-4 rounded-r relative";
-                            icon = "⚠️";
-                            break;
-                        case 'caution':
-                            borderColor = "border-red-500";
-                            styles = "bg-red-50/50 text-red-900 dark:text-red-100 border-l-4 p-4 my-4 rounded-r relative";
-                            icon = "🛑";
-                            break;
-                    }
-
                     data.hName = tagName;
                     data.hProperties = {
-                        className: `${styles} ${borderColor} admonition admonition-${node.name}`,
+                        className: "admonition-wrapper",
+                        "data-admonition-type": node.name,
+                        "data-admonition-title": (node.attributes && node.attributes.title) ? node.attributes.title : undefined,
                     };
-
-                    // Inject a title element if one doesn't exist in a structured way
-                    // Use a custom data structure for the title to be rendered as a div
-                    const titleText = (node.attributes && node.attributes.title) ? node.attributes.title : node.name.toUpperCase();
-
-                    // Injecting title node:
-                    const titleParagraph = {
-                        type: 'paragraph',
-                        data: { hProperties: { className: 'font-bold mb-2 flex items-center gap-2' } },
-                        children: [
-                            { type: 'text', value: icon },
-                            { type: 'text', value: ' ' + titleText }
-                        ]
-                    };
-
-                    node.children.unshift(titleParagraph);
                 }
             }
         });
@@ -80,7 +36,6 @@ function remarkAdmonitions() {
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     // Pre-process content to support ":::note Title" syntax by converting it to ":::note{title="Title"}"
-    // This maintains compatibility with Docusaurus-style admonitions while using standard remark-directive
     const normalizedContent = content.replace(/^:::(note|tip|warning|important|caution)\s+(.+)$/gm, ':::$1{title="$2"}');
 
     return (
@@ -91,61 +46,30 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                 components={{
                     // Custom rendering for pre tags to ensure scrolling
                     pre: ({ children, node, ...props }) => (
-                        <pre {...props} className="overflow-x-auto w-full max-w-full rounded-sm">
+                        <pre {...props} className="overflow-x-auto w-full max-w-full rounded-sm bg-transparent !p-0 !m-0">
                             {children}
                         </pre>
                     ),
                     // Custom rendering for code blocks
                     code(props) {
-                        const { children, className, node, ...rest } = props
-                        const match = /language-(\w+)/.exec(className || '')
-                        const language = match ? match[1] : ''
-                        const isBash = language === 'bash' || language === 'sh'
-
-                        // Helper to extract text from React children (handles syntax highlighting nodes)
-                        const extractText = (node: any): string => {
-                            if (!node) return '';
-                            if (typeof node === 'string') return node;
-                            if (Array.isArray(node)) return node.map(extractText).join('');
-                            if (typeof node === 'object' && node.props && node.props.children) {
-                                return extractText(node.props.children);
-                            }
-                            return '';
-                        };
-
-                        const codeContent = extractText(children).replace(/\n$/, '');
-
-                        if (isBash) {
-                            return (
-                                <div className="relative group">
-                                    <div className="absolute right-2 top-2">
-                                        <button
-                                            onClick={() => window.dispatchEvent(new CustomEvent('terminal:input', { detail: codeContent + '\r' }))}
-                                            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded shadow-md flex items-center space-x-1"
-                                            title="Run in Terminal"
-                                        >
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            <span>Run</span>
-                                        </button>
-                                    </div>
-                                    <code {...rest} className={className}>
-                                        {children}
-                                    </code>
-                                </div>
-                            )
-                        }
-
-                        return match ? (
-                            <code {...rest} className={className}>
-                                {children}
-                            </code>
-                        ) : (
-                            <code {...rest} className={className}>
-                                {children}
-                            </code>
-                        )
+                        return <CodeBlock {...props} />;
                     },
-                    // Custom rendering for blockquotes to support GitHub Alerts
+                    // Custom rendering for directives (Admonitions)
+                    div: ({ node, className, children, ...props }) => {
+                        const type = props['data-admonition-type' as keyof typeof props] as string;
+                        if (type) {
+                            const title = props['data-admonition-title' as keyof typeof props] as string;
+                            return (
+                                // Cast type to AdmonitionType because we know it's one of the allowed strings if logic allows
+                                <Admonition type={type as AdmonitionType} title={title}>
+                                    {children}
+                                </Admonition>
+                            );
+                        }
+                        return <div className={className} {...props}>{children}</div>;
+                    },
+
+                    // Custom rendering for blockquotes to support GitHub Alerts (e.g. > [!NOTE])
                     blockquote: ({ children, node, ...props }) => {
                         // Helper to find the alert type from the first paragraph
                         const findAlertType = (content: React.ReactNode): { type: string | null; warning?: boolean } => {
@@ -171,38 +95,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                         const alertData = findAlertType(children);
 
                         if (alertData.type) {
-                            const type = alertData.type;
-                            let styles = "bg-muted text-foreground border-l-4 p-4 my-4 rounded-r";
-                            let borderColor = "border-primary"; // Default (NOTE)
-                            let icon = "ℹ️";
-
-                            switch (type) {
-                                case 'NOTE':
-                                    borderColor = "border-blue-500";
-                                    styles = "bg-blue-50/50 text-blue-900 dark:text-blue-100 border-l-4 p-4 my-4 rounded-r";
-                                    icon = "ℹ️";
-                                    break;
-                                case 'TIP':
-                                    borderColor = "border-green-500";
-                                    styles = "bg-green-50/50 text-green-900 dark:text-green-100 border-l-4 p-4 my-4 rounded-r";
-                                    icon = "💡";
-                                    break;
-                                case 'IMPORTANT':
-                                    borderColor = "border-purple-500";
-                                    styles = "bg-purple-50/50 text-purple-900 dark:text-purple-100 border-l-4 p-4 my-4 rounded-r";
-                                    icon = "📢";
-                                    break;
-                                case 'WARNING':
-                                    borderColor = "border-yellow-500";
-                                    styles = "bg-yellow-50/50 text-yellow-900 dark:text-yellow-100 border-l-4 p-4 my-4 rounded-r";
-                                    icon = "⚠️";
-                                    break;
-                                case 'CAUTION':
-                                    borderColor = "border-red-500";
-                                    styles = "bg-red-50/50 text-red-900 dark:text-red-100 border-l-4 p-4 my-4 rounded-r";
-                                    icon = "🛑";
-                                    break;
-                            }
+                            const type = alertData.type as AdmonitionType;
 
                             // Remove the [!NOTE] text from the first paragraph
                             const processedChildren = React.Children.map(children, (child, index) => {
@@ -223,15 +116,9 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                             });
 
                             return (
-                                <div className={`${styles} ${borderColor} relative`} role="alert">
-                                    <div className="font-bold mb-2 flex items-center gap-2">
-                                        <span>{icon}</span>
-                                        <span>{type}</span>
-                                    </div>
-                                    <div className="text-sm opacity-90">
-                                        {processedChildren}
-                                    </div>
-                                </div>
+                                <Admonition type={type}>
+                                    {processedChildren}
+                                </Admonition>
                             );
                         }
 
