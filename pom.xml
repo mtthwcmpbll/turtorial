@@ -111,6 +111,14 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/mtthwcmpbll/turtorial</url>
+        </repository>
+    </distributionManagement>
+
 	<repositories>
 		<repository>
 			<id>jetbrains-dependencies</id>
