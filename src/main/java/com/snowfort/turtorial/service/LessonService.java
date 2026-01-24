@@ -21,8 +21,11 @@ public class LessonService {
 
     private final List<Lesson> lessons = new ArrayList<>();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private final String lessonsDirectory;
 
-    public LessonService() {
+    public LessonService(
+            @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.directory}") String lessonsDirectory) {
+        this.lessonsDirectory = lessonsDirectory;
     }
 
     @PostConstruct
@@ -33,43 +36,79 @@ public class LessonService {
     public void loadLessons() {
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            // Find all markdown/mdx files in lessons directory
-            Resource[] resources = resolver.getResources("classpath*:lessons/**/*.*");
+            String locationPattern;
+
+            // Determine if we are loading from classpath or file system
+            if (lessonsDirectory.startsWith("classpath:") || lessonsDirectory.startsWith("file:")) {
+                locationPattern = lessonsDirectory + "/**/*.*";
+            } else {
+                locationPattern = "file:" + lessonsDirectory + "/**/*.*";
+            }
+
+            System.out.println("Loading lessons from: " + locationPattern);
+
+            Resource[] resources;
+            try {
+                resources = resolver.getResources(locationPattern);
+            } catch (java.io.FileNotFoundException e) {
+                System.out.println("No lessons found at " + locationPattern);
+                return;
+            }
+
+            if (resources == null || resources.length == 0) {
+                System.out.println("No lesson resources found at " + locationPattern);
+                return;
+            }
 
             Map<String, Lesson> lessonMap = new TreeMap<>(); // Sorted by key (lesson directory name)
 
             for (Resource resource : resources) {
-                String path = resource.getURL().getPath();
-                if (!path.endsWith(".md") && !path.endsWith(".mdx")) {
-                    continue;
+                try {
+                    String path = resource.getURL().getPath();
+                    if (!path.endsWith(".md") && !path.endsWith(".mdx")) {
+                        continue;
+                    }
+
+                    // Extract lesson ID and step ID from path relative to the configured directory
+                    // We need a robust way to get the relative path.
+                    // If it's a file resource, we can use the file path.
+                    // If it's a classpath resource, it's a bit trickier, but usually ends with
+                    // .../lessons/{lessonId}/{stepId}.{md|mdx}
+
+                    String relativePath = getRelativePath(resource);
+
+                    if (relativePath == null) {
+                        System.err.println("Could not determine relative path for " + resource.getDescription());
+                        continue;
+                    }
+
+                    // Remove leading slash if present
+                    if (relativePath.startsWith("/")) {
+                        relativePath = relativePath.substring(1);
+                    }
+
+                    String[] segments = relativePath.split("/");
+
+                    if (segments.length < 2)
+                        continue; // Need lessonDir/stepFile
+
+                    String lessonDir = segments[segments.length - 2];
+                    String stepFile = segments[segments.length - 1];
+
+                    Lesson lesson = lessonMap.computeIfAbsent(lessonDir, k -> {
+                        Lesson l = new Lesson();
+                        l.setId(k);
+                        l.setTitle(formatTitle(k));
+                        l.setSteps(new ArrayList<>());
+                        return l;
+                    });
+
+                    Step step = parseStep(resource, stepFile);
+                    lesson.getSteps().add(step);
+                } catch (Exception e) {
+                    System.err.println(
+                            "Failed to process resource: " + resource.getDescription() + ". Error: " + e.getMessage());
                 }
-
-                // extraction logic depending on path structure
-                // Expected: .../lessons/{lessonId}/{stepId}.{md|mdx}
-
-                String[] parts = path.split("/lessons/");
-                if (parts.length < 2)
-                    continue;
-
-                String relativePath = parts[1];
-                String[] segments = relativePath.split("/");
-
-                if (segments.length < 2)
-                    continue; // Need lessonDir/stepFile
-
-                String lessonDir = segments[segments.length - 2];
-                String stepFile = segments[segments.length - 1];
-
-                Lesson lesson = lessonMap.computeIfAbsent(lessonDir, k -> {
-                    Lesson l = new Lesson();
-                    l.setId(k);
-                    l.setTitle(formatTitle(k));
-                    l.setSteps(new ArrayList<>());
-                    return l;
-                });
-
-                Step step = parseStep(resource, stepFile);
-                lesson.getSteps().add(step);
             }
 
             // Sort steps
@@ -82,6 +121,43 @@ public class LessonService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getRelativePath(Resource resource) throws IOException {
+        String fullPath = resource.getURL().getPath();
+
+        // Normalize lessons directory path to matching what we might find in the URL
+        // This is a heuristic.
+
+        String cleanConfigDir = lessonsDirectory.replace("classpath:", "").replace("file:", "");
+
+        // If the full path contains the config directory, we can slice it.
+        int index = fullPath.indexOf(cleanConfigDir);
+        if (index != -1) {
+            return fullPath.substring(index + cleanConfigDir.length());
+        }
+
+        // Fallback for classpath if the exact string doesn't match (e.g. built inside a
+        // jar)
+        // If we assumed standard structure .../lessons/lessonId/stepId
+        if (lessonsDirectory.contains("lessons")) {
+            String[] parts = fullPath.split("/lessons/");
+            if (parts.length >= 2) {
+                return parts[1];
+            }
+        }
+
+        // If we are just given a directory and we are scanning recursively,
+        // maybe we can just take the last two segments?
+        // But that assumes specific depth.
+        // Let's rely on the file system relative path if possible.
+        if (resource.isFile()) {
+            java.io.File root = new java.io.File(lessonsDirectory.replace("file:", ""));
+            java.io.File file = resource.getFile();
+            return file.getAbsolutePath().replace(root.getAbsolutePath(), "");
+        }
+
+        return null;
     }
 
     private Step parseStep(Resource resource, String filename) throws IOException {
@@ -146,6 +222,8 @@ public class LessonService {
     private String formatTitle(String slug) {
         // Simple humanization: "01-introduction" -> "Introduction"
         String title = slug.replaceAll("^\\d+-", "").replace("-", " ");
+        if (title.isEmpty())
+            return title;
         return title.substring(0, 1).toUpperCase() + title.substring(1);
     }
 
