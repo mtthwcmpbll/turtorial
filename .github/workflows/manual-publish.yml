@@ -1,4 +1,4 @@
-name: Manual Publish
+name: Manually Publish Image
 
 on:
   workflow_dispatch:
@@ -47,4 +47,4 @@ jobs:
           context: .
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          platforms: linux/arm64
+          platforms: linux/amd64, linux/arm64
