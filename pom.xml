@@ -179,6 +179,15 @@
                                 <phase>generate-resources</phase>
                             </execution>
                             <execution>
+                                <id>npm ci</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>ci</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>vite build</id>
                                 <goals>
                                     <goal>npx</goal>
