@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: src/main/frontend/package-lock.json
+  checksum: fae4f25b0842c0dc92a6351abe72d4966d0d703c1e3871f0e8dd041a54a61e9d
+version: "1.0"
