@@ -50,7 +50,8 @@ WORKDIR /app
 
 # Copy the built application
 # Assumes `mvn clean package` has been run locally
-COPY target/turtorial-*-SNAPSHOT.jar /app/turtorial.jar
+ARG JAR_FILE=target/turtorial-*-SNAPSHOT.jar
+COPY ${JAR_FILE} /app/turtorial.jar
 
 # Change ownership of the app directory
 RUN chown -R turtorial:turtorial /app

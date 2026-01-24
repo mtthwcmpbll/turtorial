@@ -1,0 +1,148 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (major, minor, patch)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAME: mtthwcmpbll/turtorial
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build and Test with Maven
+        run: mvn -B verify
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: src/main/frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src/main/frontend
+      - name: Run Frontend Tests
+        run: npm run test
+        working-directory: src/main/frontend
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: src/main/frontend/package-lock.json
+      
+      - name: Get short SHA
+        id: slug
+        run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+
+      - name: Calculate Release Version
+        id: calculate_version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          VERSION=$(python3 .github/workflows/scripts/get-next-version.py ${{ inputs.release_type }})
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Next version: $VERSION"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update POM to Release Version
+        run: mvn -B versions:set -DnewVersion=${{ env.RELEASE_VERSION }} -DgenerateBackupPoms=false
+
+      - name: Build and Publish Maven
+        env:
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B deploy -Pproduction
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.slug.outputs.sha8 }}
+          platforms: linux/amd64, linux/arm64
+          build-args: |
+            JAR_FILE=target/turtorial-${{ env.RELEASE_VERSION }}.jar
+
+      - name: Calculate Next Snapshot Version
+        id: next_snapshot
+        run: |
+          IFS='.' read -r major minor patch <<< "${{ env.RELEASE_VERSION }}"
+          NEXT_PATCH=$((patch + 1))
+          NEXT_SNAPSHOT="${major}.${minor}.${NEXT_PATCH}-SNAPSHOT"
+          echo "NEXT_SNAPSHOT=$NEXT_SNAPSHOT" >> $GITHUB_ENV
+          echo "Next snapshot: $NEXT_SNAPSHOT"
+
+      - name: Update POM to Next Snapshot
+        run: mvn -B versions:set -DnewVersion=${{ env.NEXT_SNAPSHOT }} -DgenerateBackupPoms=false
+
+      - name: Commit and Push
+        run: |
+          git commit -am "Releasing version ${{ env.RELEASE_VERSION }}"
+          git push
