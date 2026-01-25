@@ -1,4 +1,6 @@
 fileignoreconfig:
+- filename: .github/workflows/release.yml
+  checksum: 5fc68c655ea8e84be2711ce3aef887505c98b1b0fb62f4cda642c8aaf7a7039a
 - filename: src/main/frontend/package-lock.json
   checksum: 1ae42621e6c06869586d05c5179db700f8c3ea2682d519e0183b8dafd8d4920c
 version: "1.0"
