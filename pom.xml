@@ -8,28 +8,38 @@
         <version>4.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    
     <groupId>com.snowfort</groupId>
     <artifactId>turtorial</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    
     <name>turtorial</name>
     <description>turtorial</description>
     <url/>
+    
     <licenses>
-        <license/>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
     </licenses>
+
     <developers>
         <developer/>
     </developers>
+    
     <scm>
         <connection/>
         <developerConnection/>
         <tag/>
         <url/>
     </scm>
+
     <properties>
         <java.version>25</java.version>
         <spring-modulith.version>2.0.1</spring-modulith.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -99,6 +109,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -114,9 +125,14 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Packages</name>
+            <name>mtthwcmpbll</name>
             <url>https://maven.pkg.github.com/mtthwcmpbll/turtorial</url>
         </repository>
+        <snapshotRepository>
+            <id>github</id>
+            <name>mtthwcmpbll</name>
+            <url>https://maven.pkg.github.com/mtthwcmpbll/turtorial</url>
+        </snapshotRepository>
     </distributionManagement>
 
 	<repositories>
