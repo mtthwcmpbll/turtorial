@@ -4,6 +4,7 @@ export interface Step {
     content: string;
     runCommand?: string;
     testCommand?: string;
+    section?: string;
 }
 
 export interface Lesson {

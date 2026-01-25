@@ -6,6 +6,7 @@ public class Step {
     private String content;
     private String runCommand;
     private String testCommand;
+    private String section;
 
     public String getId() {
         return id;
@@ -45,5 +46,13 @@ public class Step {
 
     public void setTestCommand(String testCommand) {
         this.testCommand = testCommand;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 }

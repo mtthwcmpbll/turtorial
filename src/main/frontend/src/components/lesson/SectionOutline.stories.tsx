@@ -38,6 +38,23 @@ export const Default: Story = {
     },
 };
 
+const mockStepsWithSections: Step[] = [
+    { id: '1', title: 'Introduction', content: '', section: 'Getting Started' },
+    { id: '2', title: 'Listing Files', content: '', section: 'Getting Started' },
+    { id: '3', title: 'Changing Directories', content: '', section: 'Navigation' },
+    { id: '4', title: 'Making Directories', content: '', section: 'Navigation' },
+    { id: '5', title: 'Moving Files', content: '', section: 'File Manipulation' },
+];
+
+export const WithSections: Story = {
+    args: {
+        steps: mockStepsWithSections,
+        currentIndex: 2,
+        completedSteps: new Set([0, 1]),
+        onSelectStep: () => { },
+    },
+};
+
 export const AllCompleted: Story = {
     args: {
         steps: mockSteps,

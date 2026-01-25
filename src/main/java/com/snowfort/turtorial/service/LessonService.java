@@ -208,6 +208,8 @@ public class LessonService {
                     step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
+                if (node.has("section"))
+                    step.setSection(node.get("section").asText());
             } catch (Exception e) {
                 System.err.println("Error parsing YAML for " + filename + ": " + e.getMessage());
             }
