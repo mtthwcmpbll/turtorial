@@ -128,6 +128,7 @@ jobs:
           tags: |
             ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.slug.outputs.sha8 }}
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.RELEASE_VERSION }}
           platforms: linux/amd64, linux/arm64
           build-args: |
             JAR_FILE=target/turtorial-${{ env.RELEASE_VERSION }}.jar
