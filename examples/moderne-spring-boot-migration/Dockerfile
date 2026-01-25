@@ -7,7 +7,6 @@ FROM turtorial:latest AS base
 # - You should always switch back to the turtorial user at the end, so that the web-based terminal runs as that user.
 # - The turtorial platform is located in /app, but you shouldn't need that when building your workshop here
 
-
 ################################################################################
 # MODERNE CLI SETUP
 ################################################################################
@@ -60,10 +59,12 @@ ENV WORKSHOP=/home/turtorial/moderne-migration-practice
 RUN sed -i 's/git@github.com:/https:\/\/github.com\//g' ${WORKSHOP}/repos.csv
 RUN sed -i 's/git@github.com:/https:\/\/github.com\//g' ${WORKSHOP}/repos-waves.csv
 
-
 # Clone our practice repository
 RUN mkdir -p /home/turtorial/workspaces/step1 \
     && cd /home/turtorial/workspaces/step1 \
     && mod git sync csv . ${WORKSHOP}/repos.csv --with-sources
+
+# Copy over our lessons
+COPY --chown=turtorial:turtorial lessons /app/lessons
 
 WORKDIR /home/turtorial
