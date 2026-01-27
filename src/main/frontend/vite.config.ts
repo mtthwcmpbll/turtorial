@@ -50,6 +50,20 @@ export default defineConfig({
         },
         setupFiles: ['.storybook/vitest.setup.ts']
       }
+    },
+    {
+      test: {
+        name: 'components',
+        browser: {
+          enabled: true,
+          headless: true,
+          provider: playwright({}),
+          instances: [{
+            browser: 'chromium'
+          }]
+        },
+        include: ['src/**/*.test.tsx', 'src/**/*.spec.tsx'],
+      }
     }]
   }
 });
