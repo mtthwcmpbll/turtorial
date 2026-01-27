@@ -119,7 +119,7 @@ public class LessonService {
             }
 
             // Sort steps
-            lessonMap.values().forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getId)));
+            lessonMap.values().forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getOrder).thenComparing(Step::getId)));
 
             this.lessons.clear();
             this.lessons.addAll(lessonMap.values());
@@ -227,6 +227,8 @@ public class LessonService {
                     step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
+                if (node.has("order"))
+                    step.setOrder(node.get("order").asInt());
             } catch (Exception e) {
                 System.err.println("Error parsing YAML for " + filename + ": " + e.getMessage());
             }
@@ -234,6 +236,10 @@ public class LessonService {
 
         // Send Raw Markdown to Frontend
         step.setContent(content.toString());
+
+        if (step.getOrder() == null) {
+            step.setOrder(Integer.MAX_VALUE);
+        }
 
         return step;
     }

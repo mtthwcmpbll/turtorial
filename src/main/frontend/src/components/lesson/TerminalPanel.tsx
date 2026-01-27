@@ -37,6 +37,18 @@ export default function TerminalPanel() {
         fitAddon.fit();
         xtermRef.current = term;
 
+        // Handle Tab key to prevent focus loss
+        term.attachCustomKeyEventHandler((arg) => {
+            if (arg.code === 'Tab' || arg.key === 'Tab') {
+                arg.preventDefault();
+                if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                    wsRef.current.send('\t');
+                }
+                return false;
+            }
+            return true;
+        });
+
         // Connect WebSocket
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.host;
