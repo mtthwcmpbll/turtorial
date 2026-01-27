@@ -6,6 +6,7 @@ import LessonListView from './components/lesson-list/LessonListView';
 interface Lesson {
   id: string;
   title: string;
+  description?: string;
 }
 
 function Home() {
