@@ -65,7 +65,10 @@ public class LessonService {
             for (Resource resource : resources) {
                 try {
                     String path = resource.getURL().getPath();
-                    if (!path.endsWith(".md") && !path.endsWith(".mdx")) {
+                    boolean isStep = path.endsWith(".md") || path.endsWith(".mdx");
+                    boolean isMetadata = path.endsWith("lesson.yml") || path.endsWith("lesson.yaml");
+
+                    if (!isStep && !isMetadata) {
                         continue;
                     }
 
@@ -93,7 +96,7 @@ public class LessonService {
                         continue; // Need lessonDir/stepFile
 
                     String lessonDir = segments[segments.length - 2];
-                    String stepFile = segments[segments.length - 1];
+                    String filename = segments[segments.length - 1];
 
                     Lesson lesson = lessonMap.computeIfAbsent(lessonDir, k -> {
                         Lesson l = new Lesson();
@@ -103,8 +106,12 @@ public class LessonService {
                         return l;
                     });
 
-                    Step step = parseStep(resource, stepFile);
-                    lesson.getSteps().add(step);
+                    if (isMetadata) {
+                        parseLessonMetadata(resource, lesson);
+                    } else {
+                        Step step = parseStep(resource, filename);
+                        lesson.getSteps().add(step);
+                    }
                 } catch (Exception e) {
                     System.err.println(
                             "Failed to process resource: " + resource.getDescription() + ". Error: " + e.getMessage());
@@ -112,7 +119,8 @@ public class LessonService {
             }
 
             // Sort steps
-            lessonMap.values().forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getId)));
+            lessonMap.values()
+                    .forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getOrder).thenComparing(Step::getId)));
 
             this.lessons.clear();
             this.lessons.addAll(lessonMap.values());
@@ -158,6 +166,18 @@ public class LessonService {
         }
 
         return null;
+    }
+
+    private void parseLessonMetadata(Resource resource, Lesson lesson) {
+        try {
+            JsonNode node = yamlMapper.readTree(resource.getInputStream());
+            if (node.has("title"))
+                lesson.setTitle(node.get("title").asText());
+            if (node.has("description"))
+                lesson.setDescription(node.get("description").asText());
+        } catch (IOException e) {
+            System.err.println("Error parsing lesson metadata for " + lesson.getId() + ": " + e.getMessage());
+        }
     }
 
     private Step parseStep(Resource resource, String filename) throws IOException {
@@ -208,6 +228,8 @@ public class LessonService {
                     step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
+                if (node.has("order"))
+                    step.setOrder(node.get("order").asInt());
                 if (node.has("section"))
                     step.setSection(node.get("section").asText());
             } catch (Exception e) {
@@ -217,6 +239,10 @@ public class LessonService {
 
         // Send Raw Markdown to Frontend
         step.setContent(content.toString());
+
+        if (step.getOrder() == null) {
+            step.setOrder(Integer.MAX_VALUE);
+        }
 
         return step;
     }

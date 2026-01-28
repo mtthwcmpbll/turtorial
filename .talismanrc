@@ -2,5 +2,9 @@ fileignoreconfig:
 - filename: .github/workflows/release.yml
   checksum: 5fc68c655ea8e84be2711ce3aef887505c98b1b0fb62f4cda642c8aaf7a7039a
 - filename: src/main/frontend/package-lock.json
-  checksum: 1ae42621e6c06869586d05c5179db700f8c3ea2682d519e0183b8dafd8d4920c
+  checksum: beffda6d96003936a7ea900c29ad61e135ccf83e3f462abe17666cc794208c99
+- filename: src/main/frontend/src/components/lesson-list/LessonListView.tsx
+  checksum: 8ee7751883a36a60d99c450e05425792c8702e218d7c34684ef0db21e57e9657
+- filename: src/main/frontend/src/components/lesson/TerminalPanel.tsx
+  checksum: 5bbc0899eb813ce0045f6e29cd0b55d15427f5d44fcf5b16f4357085ee60dba0
 version: "1.0"

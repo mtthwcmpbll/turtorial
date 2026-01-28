@@ -6,6 +6,7 @@ public class Step {
     private String content;
     private String runCommand;
     private String testCommand;
+    private Integer order;
     private String section;
 
     public String getId() {
@@ -46,6 +47,14 @@ public class Step {
 
     public void setTestCommand(String testCommand) {
         this.testCommand = testCommand;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 
     public String getSection() {
