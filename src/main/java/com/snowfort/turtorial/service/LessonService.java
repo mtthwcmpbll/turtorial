@@ -119,7 +119,8 @@ public class LessonService {
             }
 
             // Sort steps
-            lessonMap.values().forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getOrder).thenComparing(Step::getId)));
+            lessonMap.values()
+                    .forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getOrder).thenComparing(Step::getId)));
 
             this.lessons.clear();
             this.lessons.addAll(lessonMap.values());
@@ -229,6 +230,8 @@ public class LessonService {
                     step.setTestCommand(node.get("testCommand").asText());
                 if (node.has("order"))
                     step.setOrder(node.get("order").asInt());
+                if (node.has("section"))
+                    step.setSection(node.get("section").asText());
             } catch (Exception e) {
                 System.err.println("Error parsing YAML for " + filename + ": " + e.getMessage());
             }

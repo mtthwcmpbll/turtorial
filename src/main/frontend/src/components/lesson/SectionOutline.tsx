@@ -1,4 +1,5 @@
 import * as ScrollArea from '@radix-ui/react-scroll-area';
+import { Fragment } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { Step } from '../../types';
@@ -22,33 +23,42 @@ export default function SectionOutline({ steps, currentIndex, completedSteps, on
                     {steps.map((step, index) => {
                         const isActive = index === currentIndex;
                         const isCompleted = completedSteps.has(index);
+                        const prevSection = index > 0 ? steps[index - 1].section : undefined;
+                        const showSectionHeader = step.section && step.section !== prevSection;
+
                         return (
-                            <button
-                                key={step.id || index}
-                                onClick={() => onSelectStep(index)}
-                                className={cn(
-                                    "w-full text-left p-2.5 rounded-md flex items-center group transition-colors",
-                                    isActive ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground'
+                            <Fragment key={step.id || index}>
+                                {showSectionHeader && (
+                                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-6 mb-2 px-2">
+                                        {step.section}
+                                    </h3>
                                 )}
-                            >
-                                <div className={cn(
-                                    "mr-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border transition-colors",
-                                    isCompleted
-                                        ? 'bg-success border-success text-success-foreground'
-                                        : isActive
-                                            ? 'border-primary text-primary'
-                                            : 'border-border text-muted-foreground group-hover:border-foreground/50'
-                                )}>
-                                    {isCompleted ? (
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                                    ) : (
-                                        <span className="text-[10px] font-mono leading-none">{index + 1}</span>
+                                <button
+                                    onClick={() => onSelectStep(index)}
+                                    className={cn(
+                                        "w-full text-left p-2.5 rounded-md flex items-center group transition-colors",
+                                        isActive ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground'
                                     )}
-                                </div>
-                                <span className={cn("truncate text-sm", isActive ? 'text-foreground' : '')}>
-                                    {step.title || `Step ${index + 1}`}
-                                </span>
-                            </button>
+                                >
+                                    <div className={cn(
+                                        "mr-3 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border transition-colors",
+                                        isCompleted
+                                            ? 'bg-success border-success text-success-foreground'
+                                            : isActive
+                                                ? 'border-primary text-primary'
+                                                : 'border-border text-muted-foreground group-hover:border-foreground/50'
+                                    )}>
+                                        {isCompleted ? (
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                                        ) : (
+                                            <span className="text-[10px] font-mono leading-none">{index + 1}</span>
+                                        )}
+                                    </div>
+                                    <span className={cn("truncate text-sm", isActive ? 'text-foreground' : '')}>
+                                        {step.title || `Step ${index + 1}`}
+                                    </span>
+                                </button>
+                            </Fragment>
                         );
                     })}
                 </ScrollArea.Viewport>
