@@ -1,0 +1,91 @@
+[INFO] Scanning for projects...
+[INFO]
+[INFO] -----------------------< com.snowfort:turtorial >-----------------------
+[INFO] Building turtorial 0.0.2-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] >>> spring-boot:4.0.1:run (default-cli) > test-compile @ turtorial >>>
+[INFO]
+[INFO] --- resources:3.3.1:resources (default-resources) @ turtorial ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO]
+[INFO] --- compiler:3.14.1:compile (default-compile) @ turtorial ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ turtorial ---
+[INFO] skip non existing resourceDirectory /app/src/test/resources
+[INFO]
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ turtorial ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO]
+[INFO] <<< spring-boot:4.0.1:run (default-cli) < test-compile @ turtorial <<<
+[INFO]
+[INFO]
+[INFO] --- spring-boot:4.0.1:run (default-cli) @ turtorial ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.1)
+
+2026-01-31T15:21:34.719Z  INFO 6768 --- [turtorial] [  restartedMain] c.s.turtorial.TurtorialApplication       : Starting TurtorialApplication using Java 21.0.9 with PID 6768 (/app/target/classes started by jules in /app)
+2026-01-31T15:21:34.723Z  INFO 6768 --- [turtorial] [  restartedMain] c.s.turtorial.TurtorialApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-01-31T15:21:34.785Z  INFO 6768 --- [turtorial] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-31T15:21:34.785Z  INFO 6768 --- [turtorial] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-01-31T15:21:35.802Z  INFO 6768 --- [turtorial] [cTaskExecutor-1] com.tngtech.archunit.core.PluginLoader   : Detected Java version 21.0.9
+2026-01-31T15:21:37.834Z  INFO 6768 --- [turtorial] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-01-31T15:21:37.850Z  INFO 6768 --- [turtorial] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-31T15:21:37.850Z  INFO 6768 --- [turtorial] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-31T15:21:37.886Z  INFO 6768 --- [turtorial] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3099 ms
+Loading lessons from: file:/tmp/test-lessons/**/*.*
+Loaded 1 lessons.
+2026-01-31T15:21:38.871Z  INFO 6768 --- [turtorial] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-01-31T15:21:38.949Z  INFO 6768 --- [turtorial] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-01-31T15:21:38.960Z  INFO 6768 --- [turtorial] [  restartedMain] o.s.s.config.TaskSchedulerRouter         : No TaskScheduler/ScheduledExecutorService bean found for scheduled processing
+2026-01-31T15:21:38.967Z  INFO 6768 --- [turtorial] [  restartedMain] c.s.turtorial.TurtorialApplication       : Started TurtorialApplication in 4.738 seconds (process running for 5.291)
+2026-01-31T15:22:50.965Z  INFO 6768 --- [turtorial] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-31T15:22:50.966Z  INFO 6768 --- [turtorial] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-01-31T15:22:50.968Z  INFO 6768 --- [turtorial] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-01-31T15:22:51.404Z  INFO 6768 --- [turtorial] [nio-8080-exec-3] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection established: ec3606de-9d5a-5fda-e3ec-98c39595d320
+2026-01-31T15:22:51.405Z  INFO 6768 --- [turtorial] [nio-8080-exec-3] c.s.t.terminal.TerminalSocketHandler     : Starting PTY process for session: ec3606de-9d5a-5fda-e3ec-98c39595d320
+2026-01-31T15:22:51.434Z  INFO 6768 --- [turtorial] [nio-8080-exec-4] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection established: 7395df31-371a-5608-9e66-d6a00038db3b
+2026-01-31T15:22:51.434Z  INFO 6768 --- [turtorial] [nio-8080-exec-4] c.s.t.terminal.TerminalSocketHandler     : Starting PTY process for session: 7395df31-371a-5608-9e66-d6a00038db3b
+2026-01-31T15:22:51.521Z  INFO 6768 --- [turtorial] [nio-8080-exec-3] com.pty4j.util.ExtractedNative           : Extracted pty4j native in 12 ms
+2026-01-31T15:22:51.539Z  INFO 6768 --- [turtorial] [nio-8080-exec-3] c.s.t.terminal.TerminalSocketHandler     : PTY process started in 133 ms for session: ec3606de-9d5a-5fda-e3ec-98c39595d320
+2026-01-31T15:22:51.553Z  INFO 6768 --- [turtorial] [nio-8080-exec-4] c.s.t.terminal.TerminalSocketHandler     : PTY process started in 118 ms for session: 7395df31-371a-5608-9e66-d6a00038db3b
+2026-01-31T15:22:51.568Z  INFO 6768 --- [turtorial] [nio-8080-exec-3] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection closed: ec3606de-9d5a-5fda-e3ec-98c39595d320
+2026-01-31T15:22:51.568Z  INFO 6768 --- [turtorial] [pool-3-thread-1] c.s.t.terminal.TerminalSocketHandler     : PTY output stream closed for session ec3606de-9d5a-5fda-e3ec-98c39595d320
+2026-01-31T15:22:52.307Z  INFO 6768 --- [turtorial] [nio-8080-exec-5] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection closed: 7395df31-371a-5608-9e66-d6a00038db3b
+2026-01-31T15:22:52.310Z  INFO 6768 --- [turtorial] [pool-4-thread-1] c.s.t.terminal.TerminalSocketHandler     : PTY output stream closed for session 7395df31-371a-5608-9e66-d6a00038db3b
+2026-01-31T15:23:23.851Z  INFO 6768 --- [turtorial] [nio-8080-exec-8] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection established: 6301a36f-c8fd-cc29-375e-7b432f2f1223
+2026-01-31T15:23:23.851Z  INFO 6768 --- [turtorial] [nio-8080-exec-8] c.s.t.terminal.TerminalSocketHandler     : Starting PTY process for session: 6301a36f-c8fd-cc29-375e-7b432f2f1223
+2026-01-31T15:23:23.862Z  INFO 6768 --- [turtorial] [nio-8080-exec-8] c.s.t.terminal.TerminalSocketHandler     : PTY process started in 10 ms for session: 6301a36f-c8fd-cc29-375e-7b432f2f1223
+2026-01-31T15:23:23.886Z  INFO 6768 --- [turtorial] [nio-8080-exec-9] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection established: 1657d5a5-92fd-0a98-a422-e7bdd577deb1
+2026-01-31T15:23:23.887Z  INFO 6768 --- [turtorial] [nio-8080-exec-9] c.s.t.terminal.TerminalSocketHandler     : Starting PTY process for session: 1657d5a5-92fd-0a98-a422-e7bdd577deb1
+2026-01-31T15:23:23.890Z  INFO 6768 --- [turtorial] [io-8080-exec-10] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection closed: 6301a36f-c8fd-cc29-375e-7b432f2f1223
+2026-01-31T15:23:23.890Z  INFO 6768 --- [turtorial] [pool-5-thread-1] c.s.t.terminal.TerminalSocketHandler     : PTY output stream closed for session 6301a36f-c8fd-cc29-375e-7b432f2f1223
+2026-01-31T15:23:23.905Z  INFO 6768 --- [turtorial] [nio-8080-exec-9] c.s.t.terminal.TerminalSocketHandler     : PTY process started in 18 ms for session: 1657d5a5-92fd-0a98-a422-e7bdd577deb1
+2026-01-31T15:23:24.487Z  INFO 6768 --- [turtorial] [nio-8080-exec-1] c.s.t.terminal.TerminalSocketHandler     : WebSocket connection closed: 1657d5a5-92fd-0a98-a422-e7bdd577deb1
+2026-01-31T15:23:24.488Z  INFO 6768 --- [turtorial] [pool-6-thread-1] c.s.t.terminal.TerminalSocketHandler     : PTY output stream closed for session 1657d5a5-92fd-0a98-a422-e7bdd577deb1
+2026-01-31T15:23:49.867Z  INFO 6768 --- [turtorial] [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-31T15:23:49.876Z  INFO 6768 --- [turtorial] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:18 min
+[INFO] Finished at: 2026-01-31T15:23:49Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:4.0.1:run (default-cli) on project turtorial: Process terminated with exit code: 143 -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

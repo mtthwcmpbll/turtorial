@@ -1,6 +1,9 @@
 package com.snowfort.turtorial.service;
 
 import com.snowfort.turtorial.model.Lesson;
+import com.snowfort.turtorial.model.QuizQuestion;
+import com.snowfort.turtorial.model.QuizType;
+import com.snowfort.turtorial.model.Step;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -169,5 +172,54 @@ public class LessonServiceTest {
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertTrue(lessons.isEmpty());
+    }
+
+    @Test
+    public void testLoadLessonsWithQuizzes(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/lesson-quiz");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        String content = "---\n" +
+                "title: Step Quiz\n" +
+                "quizzes:\n" +
+                "  - question: 'What is 2+2?'\n" +
+                "    type: CHOICE\n" +
+                "    options:\n" +
+                "      - '3'\n" +
+                "      - '4'\n" +
+                "      - '5'\n" +
+                "    correctAnswer: '4'\n" +
+                "  - question: 'Type hello'\n" +
+                "    type: TEXT\n" +
+                "    validationRegex: '^hello$'\n" +
+                "---\n" +
+                "# Content";
+
+        Files.writeString(step1, content);
+
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        service.init();
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
+
+        Lesson lesson = lessons.get(0);
+        Step step = lesson.getSteps().get(0);
+
+        List<QuizQuestion> quizzes = step.getQuizzes();
+        Assertions.assertNotNull(quizzes);
+        Assertions.assertEquals(2, quizzes.size());
+
+        QuizQuestion q1 = quizzes.get(0);
+        Assertions.assertEquals("What is 2+2?", q1.getQuestion());
+        Assertions.assertEquals(QuizType.CHOICE, q1.getType());
+        Assertions.assertEquals(3, q1.getOptions().size());
+        Assertions.assertEquals("4", q1.getCorrectAnswer());
+
+        QuizQuestion q2 = quizzes.get(1);
+        Assertions.assertEquals("Type hello", q2.getQuestion());
+        Assertions.assertEquals(QuizType.TEXT, q2.getType());
+        Assertions.assertEquals("^hello$", q2.getValidationRegex());
     }
 }
