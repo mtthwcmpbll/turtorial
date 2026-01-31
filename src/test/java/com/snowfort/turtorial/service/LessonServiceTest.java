@@ -37,7 +37,7 @@ public class LessonServiceTest {
         Files.writeString(step1, "---\ntitle: Test Step\n---\n# Content");
 
         // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -62,7 +62,7 @@ public class LessonServiceTest {
         Files.writeString(meta, "title: Custom Title\ndescription: Custom Description");
 
         // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -89,7 +89,7 @@ public class LessonServiceTest {
         Files.writeString(step2, "---\ntitle: Step 2\norder: 1\n---\n# Content 2");
 
         // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -126,7 +126,7 @@ public class LessonServiceTest {
         Files.writeString(stepC, "---\ntitle: Step C\n---\n# Content C");
 
         // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -156,7 +156,7 @@ public class LessonServiceTest {
         Files.writeString(step2, "---\ntitle: Step 2\nsection: Advanced\n---\n# Content");
 
         // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -178,7 +178,7 @@ public class LessonServiceTest {
         Path lessonsDir = tempDir.resolve("lessons");
         Files.createDirectories(lessonsDir);
 
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -199,7 +199,7 @@ public class LessonServiceTest {
         // Mock production environment
         when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(true);
 
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -220,7 +220,7 @@ public class LessonServiceTest {
         // Mock dev environment (not production)
         when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
 
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -240,7 +240,7 @@ public class LessonServiceTest {
         Files.writeString(step2, "---\ntitle: Draft Step\ndraft: true\n---\n# Draft Content");
 
         // devMode = false
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -263,7 +263,7 @@ public class LessonServiceTest {
         Files.writeString(step2, "---\ntitle: Draft Step\ndraft: true\n---\n# Draft Content");
 
         // devMode = true
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true, mockEnv);
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true, false, mockEnv);
         service.init();
 
         List<Lesson> lessons = service.findAll();

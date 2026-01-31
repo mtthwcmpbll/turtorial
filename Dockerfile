@@ -49,9 +49,8 @@ RUN mkdir -p /home/turtorial/.ssh \
 WORKDIR /app
 
 # Copy the built application
-# Assumes `mvn clean package` has been run locally
-ARG JAR_FILE=target/turtorial-*-SNAPSHOT.jar
-COPY ${JAR_FILE} /app/turtorial.jar
+# Assumes `mvn clean package -Pnative` has been run locally
+COPY target/turtorial /app/turtorial
 
 # Change ownership of the app directory
 RUN chown -R turtorial:turtorial /app
@@ -69,4 +68,4 @@ EXPOSE 8080
 RUN mkdir -p /app/lessons
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "/app/turtorial.jar"]
+ENTRYPOINT ["/app/turtorial"]

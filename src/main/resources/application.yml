@@ -6,3 +6,5 @@ turtorial:
   dev-mode: true
   lessons:
     directory: classpath:/lessons
+    environmentScripts:
+      enabled: false
