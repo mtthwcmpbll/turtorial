@@ -303,6 +303,8 @@ public class LessonService {
 
         try {
             Process process = new ProcessBuilder("/bin/sh", "-c", step.getTestCommand())
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             int exitCode = process.waitFor();
             return exitCode == 0;
