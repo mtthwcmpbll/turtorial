@@ -37,6 +37,31 @@ public class LessonServiceTest {
     }
 
     @Test
+    public void testLoadLessonsWithMetadata(@TempDir Path tempDir) throws IOException {
+        // Create a mock lesson structure
+        Path lessonDir = tempDir.resolve("lessons/lesson-meta");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        Files.writeString(step1, "# Content");
+
+        Path meta = lessonDir.resolve("lesson.yml");
+        Files.writeString(meta, "title: Custom Title\ndescription: Custom Description");
+
+        // Initialize service pointing to temp dir
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        service.init();
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
+
+        Lesson lesson = lessons.get(0);
+        Assertions.assertEquals("Custom Title", lesson.getTitle());
+        Assertions.assertEquals("Custom Description", lesson.getDescription());
+        Assertions.assertEquals(1, lesson.getSteps().size());
+    }
+
+    @Test
     public void testLoadLessonsEmptyDirectory(@TempDir Path tempDir) throws IOException {
         Path lessonsDir = tempDir.resolve("lessons");
         Files.createDirectories(lessonsDir);
