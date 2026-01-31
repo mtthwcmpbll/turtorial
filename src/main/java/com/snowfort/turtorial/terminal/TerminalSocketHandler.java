@@ -54,7 +54,7 @@ public class TerminalSocketHandler extends TextWebSocketHandler {
             // Initial window size
             process.setWinSize(new WinSize(80, 24));
 
-            ExecutorService executor = Executors.newSingleThreadExecutor();
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             sessionThreads.put(session.getId(), executor);
 
             executor.submit(() -> {
