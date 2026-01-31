@@ -8,6 +8,8 @@ import com.snowfort.turtorial.model.Step;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -22,10 +24,13 @@ public class LessonService {
     private final List<Lesson> lessons = new ArrayList<>();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     private final String lessonsDirectory;
+    private final Environment env;
 
     public LessonService(
-            @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.directory}") String lessonsDirectory) {
+            @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.directory}") String lessonsDirectory,
+            Environment env) {
         this.lessonsDirectory = lessonsDirectory;
+        this.env = env;
     }
 
     @PostConstruct
@@ -123,7 +128,16 @@ public class LessonService {
                     .forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getOrder).thenComparing(Step::getId)));
 
             this.lessons.clear();
-            this.lessons.addAll(lessonMap.values());
+
+            boolean isProduction = env.acceptsProfiles(Profiles.of("prod"));
+
+            for (Lesson l : lessonMap.values()) {
+                if (l.isDraft() && isProduction) {
+                    System.out.println("Skipping draft lesson: " + l.getId());
+                    continue;
+                }
+                this.lessons.add(l);
+            }
             System.out.println("Loaded " + lessons.size() + " lessons.");
 
         } catch (IOException e) {
@@ -175,6 +189,8 @@ public class LessonService {
                 lesson.setTitle(node.get("title").asText());
             if (node.has("description"))
                 lesson.setDescription(node.get("description").asText());
+            if (node.has("draft"))
+                lesson.setDraft(node.get("draft").asBoolean());
         } catch (IOException e) {
             System.err.println("Error parsing lesson metadata for " + lesson.getId() + ": " + e.getMessage());
         }

@@ -30,6 +30,16 @@ public class Lesson {
         this.description = description;
     }
 
+    private boolean draft;
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
+    }
+
     private java.util.List<Step> steps;
 
     public java.util.List<Step> getSteps() {

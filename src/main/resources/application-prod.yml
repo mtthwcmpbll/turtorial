@@ -4,4 +4,4 @@ spring:
 
 turtorial:
   lessons:
-    directory: classpath:/lessons
+    directory: /app/lessons
