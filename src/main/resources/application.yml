@@ -5,3 +5,6 @@ spring:
 turtorial:
   lessons:
     directory: /app/lessons
+    frontmatter:
+      validation:
+        fail-on-error: true

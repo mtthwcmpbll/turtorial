@@ -24,7 +24,7 @@ public class LessonServiceTest {
         Files.writeString(step1, "---\ntitle: Test Step\n---\n# Content");
 
         // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -49,7 +49,7 @@ public class LessonServiceTest {
         Files.writeString(meta, "title: Custom Title\ndescription: Custom Description");
 
         // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -75,7 +75,7 @@ public class LessonServiceTest {
         Files.writeString(step2, "---\ntitle: Step 2\norder: 1\n---\n# Content 2");
 
         // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -112,7 +112,7 @@ public class LessonServiceTest {
         Files.writeString(stepC, "---\ntitle: Step C\n---\n# Content C");
 
         // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -142,7 +142,7 @@ public class LessonServiceTest {
         Files.writeString(step2, "---\ntitle: Step 2\nsection: Advanced\n---\n# Content");
 
         // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -164,10 +164,41 @@ public class LessonServiceTest {
         Path lessonsDir = tempDir.resolve("lessons");
         Files.createDirectories(lessonsDir);
 
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertTrue(lessons.isEmpty());
+    }
+
+    @Test
+    public void testLoadLessonsWithInvalidFrontmatter(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/lesson-invalid");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        // "order" should be integer, but we provide a string that is not an integer
+        Files.writeString(step1, "---\ntitle: Invalid Step\norder: \"not-a-number\"\n---\n# Content");
+
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true);
+
+        Assertions.assertThrows(RuntimeException.class, () -> service.init());
+    }
+
+    @Test
+    public void testLoadLessonsWithInvalidFrontmatterWarnOnly(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/lesson-invalid-warn");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        Files.writeString(step1, "---\ntitle: Invalid Step\norder: \"not-a-number\"\n---\n# Content");
+
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false);
+
+        // Should not throw
+        service.init();
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
     }
 }
