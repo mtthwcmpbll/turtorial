@@ -31,4 +31,14 @@ public class LessonController {
     public boolean verifyStep(@PathVariable String lessonId, @PathVariable String stepId) {
         return lessonService.verifyStep(lessonId, stepId);
     }
+
+    @PostMapping("/{lessonId}/steps/{stepId}/prepare")
+    public boolean prepareStep(@PathVariable String lessonId, @PathVariable String stepId) {
+        return lessonService.prepareStep(lessonId, stepId);
+    }
+
+    @PostMapping("/{lessonId}/steps/{stepId}/cleanup")
+    public boolean cleanupStep(@PathVariable String lessonId, @PathVariable String stepId) {
+        return lessonService.cleanupStep(lessonId, stepId);
+    }
 }

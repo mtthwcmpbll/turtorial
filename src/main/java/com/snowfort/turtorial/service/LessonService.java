@@ -26,19 +26,23 @@ public class LessonService {
     private final String lessonsDirectory;
     private final Environment env;
     private final boolean devMode;
+    private final boolean environmentScriptsEnabled;
 
     public LessonService(
             @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.directory}") String lessonsDirectory,
             @org.springframework.beans.factory.annotation.Value("${turtorial.dev-mode:false}") boolean devMode,
+            @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.environmentScripts.enabled:false}") boolean environmentScriptsEnabled,
             Environment env) {
         this.lessonsDirectory = lessonsDirectory;
         this.devMode = devMode;
+        this.environmentScriptsEnabled = environmentScriptsEnabled;
         this.env = env;
     }
 
     @PostConstruct
     public void init() {
         System.out.println("Turtorial Dev Mode: " + devMode);
+        System.out.println("Environment Scripts Enabled: " + environmentScriptsEnabled);
         loadLessons();
     }
 
@@ -253,6 +257,10 @@ public class LessonService {
                     step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
+                if (node.has("before"))
+                    step.setBefore(node.get("before").asText());
+                if (node.has("after"))
+                    step.setAfter(node.get("after").asText());
                 if (node.has("order"))
                     step.setOrder(node.get("order").asInt());
                 if (node.has("section"))
@@ -305,6 +313,41 @@ public class LessonService {
         try {
             Process process = new ProcessBuilder("/bin/sh", "-c", step.getTestCommand())
                     .start();
+            int exitCode = process.waitFor();
+            return exitCode == 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean prepareStep(String lessonId, String stepId) {
+        return executeScript(lessonId, stepId, Step::getBefore);
+    }
+
+    public boolean cleanupStep(String lessonId, String stepId) {
+        return executeScript(lessonId, stepId, Step::getAfter);
+    }
+
+    private boolean executeScript(String lessonId, String stepId, java.util.function.Function<Step, String> commandExtractor) {
+        if (!environmentScriptsEnabled) {
+            return true;
+        }
+        Lesson lesson = findById(lessonId);
+        if (lesson == null) return false;
+
+        Step step = lesson.getSteps().stream()
+                .filter(s -> s.getId().equals(stepId))
+                .findFirst()
+                .orElse(null);
+
+        if (step == null) return false;
+
+        String command = commandExtractor.apply(step);
+        if (command == null || command.isEmpty()) return true;
+
+        try {
+            Process process = new ProcessBuilder("/bin/sh", "-c", command).start();
             int exitCode = process.waitFor();
             return exitCode == 0;
         } catch (Exception e) {
