@@ -6,6 +6,8 @@ public class Step {
     private String content;
     private String runCommand;
     private String testCommand;
+    private String beforeCommand;
+    private String afterCommand;
     private Integer order;
     private String section;
 
@@ -47,6 +49,22 @@ public class Step {
 
     public void setTestCommand(String testCommand) {
         this.testCommand = testCommand;
+    }
+
+    public String getBeforeCommand() {
+        return beforeCommand;
+    }
+
+    public void setBeforeCommand(String beforeCommand) {
+        this.beforeCommand = beforeCommand;
+    }
+
+    public String getAfterCommand() {
+        return afterCommand;
+    }
+
+    public void setAfterCommand(String afterCommand) {
+        this.afterCommand = afterCommand;
     }
 
     public Integer getOrder() {

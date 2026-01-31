@@ -228,6 +228,10 @@ public class LessonService {
                     step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
+                if (node.has("before"))
+                    step.setBeforeCommand(node.get("before").asText());
+                if (node.has("after"))
+                    step.setAfterCommand(node.get("after").asText());
                 if (node.has("order"))
                     step.setOrder(node.get("order").asInt());
                 if (node.has("section"))
@@ -264,21 +268,49 @@ public class LessonService {
     }
 
     public boolean verifyStep(String lessonId, String stepId) {
-        Lesson lesson = findById(lessonId);
-        if (lesson == null)
-            return false;
-
-        Step step = lesson.getSteps().stream()
-                .filter(s -> s.getId().equals(stepId))
-                .findFirst()
-                .orElse(null);
+        Step step = findStep(lessonId, stepId);
 
         if (step == null || step.getTestCommand() == null || step.getTestCommand().isEmpty()) {
             return true;
         }
 
+        return runCommand(step.getTestCommand());
+    }
+
+    public boolean prepareStep(String lessonId, String stepId) {
+        Step step = findStep(lessonId, stepId);
+
+        if (step == null || step.getBeforeCommand() == null || step.getBeforeCommand().isEmpty()) {
+            return true;
+        }
+
+        return runCommand(step.getBeforeCommand());
+    }
+
+    public boolean cleanupStep(String lessonId, String stepId) {
+        Step step = findStep(lessonId, stepId);
+
+        if (step == null || step.getAfterCommand() == null || step.getAfterCommand().isEmpty()) {
+            return true;
+        }
+
+        return runCommand(step.getAfterCommand());
+    }
+
+    private Step findStep(String lessonId, String stepId) {
+        Lesson lesson = findById(lessonId);
+        if (lesson == null)
+            return null;
+
+        return lesson.getSteps().stream()
+                .filter(s -> s.getId().equals(stepId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private boolean runCommand(String command) {
         try {
-            Process process = new ProcessBuilder("/bin/sh", "-c", step.getTestCommand())
+            Process process = new ProcessBuilder("/bin/sh", "-c", command)
                     .start();
             int exitCode = process.waitFor();
             return exitCode == 0;
