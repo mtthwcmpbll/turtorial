@@ -1,6 +1,7 @@
 package com.snowfort.turtorial.service;
 
 import com.snowfort.turtorial.model.Lesson;
+import com.snowfort.turtorial.model.Step;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -270,5 +271,28 @@ public class LessonServiceTest {
 
         Lesson lesson = lessons.get(0);
         Assertions.assertEquals(2, lesson.getSteps().size());
+    }
+
+    @Test
+    public void testFrontmatterOnly(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/fm-only");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        // File ending with --- (no newline after)
+        Files.writeString(step1, "---\ntitle: Only Metadata\n---");
+
+        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        service.init();
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
+
+        Lesson lesson = lessons.get(0);
+        Assertions.assertEquals(1, lesson.getSteps().size());
+
+        Step step = lesson.getSteps().get(0);
+        Assertions.assertEquals("Only Metadata", step.getTitle());
+        Assertions.assertEquals("", step.getContent());
     }
 }
