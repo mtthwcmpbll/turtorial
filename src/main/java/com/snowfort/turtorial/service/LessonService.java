@@ -25,16 +25,20 @@ public class LessonService {
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     private final String lessonsDirectory;
     private final Environment env;
+    private final boolean devMode;
 
     public LessonService(
             @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.directory}") String lessonsDirectory,
+            @org.springframework.beans.factory.annotation.Value("${turtorial.dev-mode:false}") boolean devMode,
             Environment env) {
         this.lessonsDirectory = lessonsDirectory;
+        this.devMode = devMode;
         this.env = env;
     }
 
     @PostConstruct
     public void init() {
+        System.out.println("Turtorial Dev Mode: " + devMode);
         loadLessons();
     }
 
@@ -115,7 +119,9 @@ public class LessonService {
                         parseLessonMetadata(resource, lesson);
                     } else {
                         Step step = parseStep(resource, filename);
-                        lesson.getSteps().add(step);
+                        if (step != null) {
+                            lesson.getSteps().add(step);
+                        }
                     }
                 } catch (Exception e) {
                     System.err.println(
@@ -238,6 +244,9 @@ public class LessonService {
         if (hasFrontMatter) {
             try {
                 JsonNode node = yamlMapper.readTree(frontMatter.toString());
+                if (node.has("draft") && node.get("draft").asBoolean() && !devMode) {
+                    return null;
+                }
                 if (node.has("title"))
                     step.setTitle(node.get("title").asText());
                 if (node.has("runCommand"))
