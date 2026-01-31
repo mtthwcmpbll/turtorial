@@ -72,7 +72,6 @@ export default function TerminalPanel() {
             };
 
             ws.onmessage = (event) => {
-                console.log("WS Message received (length):", event.data.length);
                 term.write(event.data);
             };
 
