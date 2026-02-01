@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lesson Frontmatter",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The title of the lesson step."
+    },
+    "order": {
+      "type": "integer",
+      "description": "The explicit ordering for the step."
+    },
+    "section": {
+      "type": "string",
+      "description": "The section name this step belongs to."
+    }
+  },
+  "additionalProperties": true
+}

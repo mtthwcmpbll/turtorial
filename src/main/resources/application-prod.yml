@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: turtorial
+
+turtorial:
+  dev-mode: false
+  lessons:
+    directory: /app/lessons

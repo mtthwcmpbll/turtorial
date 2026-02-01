@@ -1,0 +1,33 @@
+---
+title: Crafting Quizzes
+---
+
+# Defining Quizzes in Markdown
+
+Quizzes are defined in the frontmatter of your Markdown files using the `quizzes` key.
+
+## Multiple Choice
+
+Use `type: CHOICE` and provide a list of `options`.
+
+```yaml
+quizzes:
+  - question: "What is 2 + 2?"
+    type: CHOICE
+    options:
+      - "3"
+      - "4"
+      - "5"
+    correctAnswer: "4"
+```
+
+## Free Text
+
+Use `type: TEXT` and provide a `validationRegex`.
+
+```yaml
+quizzes:
+  - question: "Type 'confirmed' to proceed."
+    type: TEXT
+    validationRegex: "^confirmed$"
+```

@@ -21,15 +21,6 @@ export default function TerminalPanel() {
             fontFamily: '"Cascadia Code", "Fira Code", monospace',
         });
 
-        // Handle custom key events (e.g. Tab for completion)
-        term.attachCustomKeyEventHandler((event) => {
-            if (event.code === 'Tab') {
-                event.preventDefault(); // Prevent browser focus switch
-                return true; // Allow xterm to process the key
-            }
-            return true;
-        });
-
         const fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
 
@@ -72,7 +63,6 @@ export default function TerminalPanel() {
             };
 
             ws.onmessage = (event) => {
-                console.log("WS Message received (length):", event.data.length);
                 term.write(event.data);
             };
 

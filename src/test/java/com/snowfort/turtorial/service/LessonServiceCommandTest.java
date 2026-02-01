@@ -30,7 +30,10 @@ public class LessonServiceCommandTest {
         Files.writeString(step1, String.format("---\ntitle: Cmd Step\nbefore: %s\nafter: %s\n---\n# Content", beforeCmd, afterCmd));
 
         // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString());
+        LessonService service = new LessonService(
+                tempDir.resolve("lessons").toUri().toString(),
+                true,
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();

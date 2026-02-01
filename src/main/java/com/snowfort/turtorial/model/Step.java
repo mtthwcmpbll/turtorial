@@ -10,6 +10,7 @@ public class Step {
     private String afterCommand;
     private Integer order;
     private String section;
+    private java.util.List<QuizQuestion> quizzes;
 
     public String getId() {
         return id;
@@ -81,5 +82,13 @@ public class Step {
 
     public void setSection(String section) {
         this.section = section;
+    }
+
+    public java.util.List<QuizQuestion> getQuizzes() {
+        return quizzes;
+    }
+
+    public void setQuizzes(java.util.List<QuizQuestion> quizzes) {
+        this.quizzes = quizzes;
     }
 }
