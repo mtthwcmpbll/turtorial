@@ -49,6 +49,27 @@ export const Default: Story = {
     },
 };
 
+export const WithQuiz: Story = {
+    args: {
+        content: sampleMarkdown,
+        runCommand: 'ls -la',
+        onRunCommand: () => { },
+        quizzes: [
+            {
+                question: 'What command lists files?',
+                type: 'CHOICE',
+                options: ['ls', 'cd', 'mkdir'],
+                correctAnswer: 'ls'
+            },
+            {
+                question: 'Type "hello"',
+                type: 'TEXT',
+                validationRegex: '^hello$'
+            }
+        ]
+    },
+};
+
 export const NoRunCommand: Story = {
     args: {
         content: sampleMarkdown,

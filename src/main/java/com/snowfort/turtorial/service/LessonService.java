@@ -1,5 +1,6 @@
 package com.snowfort.turtorial.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -8,6 +9,7 @@ import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import com.snowfort.turtorial.model.Lesson;
+import com.snowfort.turtorial.model.QuizQuestion;
 import com.snowfort.turtorial.model.Step;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -295,6 +297,16 @@ public class LessonService {
                     step.setOrder(node.get("order").asInt());
                 if (node.has("section"))
                     step.setSection(node.get("section").asText());
+                if (node.has("quizzes")) {
+                    try {
+                        List<QuizQuestion> quizzes = yamlMapper.convertValue(node.get("quizzes"),
+                                new TypeReference<List<QuizQuestion>>() {
+                                });
+                        step.setQuizzes(quizzes);
+                    } catch (Exception e) {
+                        System.err.println("Error parsing quizzes for " + filename + ": " + e.getMessage());
+                    }
+                }
             } catch (Exception e) {
                 if (failOnError) {
                     throw new RuntimeException("Error parsing YAML for " + filename, e);

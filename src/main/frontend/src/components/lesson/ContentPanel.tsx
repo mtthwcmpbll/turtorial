@@ -45,6 +45,7 @@ export default function ContentPanel({
                     content={currentStep.content}
                     runCommand={currentStep.runCommand}
                     onRunCommand={onRunCommand}
+                    quizzes={currentStep.quizzes}
                 />
             </div>
         </div>
