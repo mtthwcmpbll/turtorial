@@ -3,9 +3,6 @@ spring:
     name: turtorial
 
 turtorial:
-  dev-mode: true
+  dev-mode: false
   lessons:
     directory: /app/lessons
-    frontmatter:
-      validation:
-        fail-on-error: true

@@ -7,4 +7,6 @@ fileignoreconfig:
   checksum: 8ee7751883a36a60d99c450e05425792c8702e218d7c34684ef0db21e57e9657
 - filename: src/main/frontend/src/components/lesson/TerminalPanel.tsx
   checksum: 5bbc0899eb813ce0045f6e29cd0b55d15427f5d44fcf5b16f4357085ee60dba0
+- filename: src/test/java/com/snowfort/turtorial/service/LessonServiceBlockingTest.java
+  checksum: f67453d0a095e386898f4d8556a0f9a202e58ef9152a51b7cf28dbc1c1ed3268
 version: "1.0"
