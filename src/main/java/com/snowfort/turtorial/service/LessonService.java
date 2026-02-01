@@ -13,14 +13,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 import jakarta.annotation.PostConstruct;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class LessonService {
@@ -28,18 +31,29 @@ public class LessonService {
     private final List<Lesson> lessons = new ArrayList<>();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     private final String lessonsDirectory;
+    private final Environment env;
+    private final boolean devMode;
+
+    private static final Pattern FRONTMATTER_PATTERN = Pattern.compile(
+            "^---\\s*\\R(.*?)\\R---\\s*(?:\\R(.*))?$",
+            Pattern.DOTALL | Pattern.MULTILINE);
     private final boolean failOnError;
     private JsonSchema schema;
 
     public LessonService(
             @Value("${turtorial.lessons.directory}") String lessonsDirectory,
-            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError) {
+            @Value("${turtorial.dev-mode:false}") boolean devMode,
+            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError,
+            Environment env) {
         this.lessonsDirectory = lessonsDirectory;
+        this.devMode = devMode;
         this.failOnError = failOnError;
+        this.env = env;
     }
 
     @PostConstruct
     public void init() {
+        System.out.println("Turtorial Dev Mode: " + devMode);
         loadSchema();
         loadLessons();
     }
@@ -134,7 +148,9 @@ public class LessonService {
                         parseLessonMetadata(resource, lesson);
                     } else {
                         Step step = parseStep(resource, filename);
-                        lesson.getSteps().add(step);
+                        if (step != null) {
+                            lesson.getSteps().add(step);
+                        }
                     }
                 } catch (Exception e) {
                     if (failOnError) {
@@ -150,7 +166,16 @@ public class LessonService {
                     .forEach(l -> l.getSteps().sort(Comparator.comparing(Step::getOrder).thenComparing(Step::getId)));
 
             this.lessons.clear();
-            this.lessons.addAll(lessonMap.values());
+
+            boolean isProduction = env.acceptsProfiles(Profiles.of("prod"));
+
+            for (Lesson l : lessonMap.values()) {
+                if (l.isDraft() && isProduction) {
+                    System.out.println("Skipping draft lesson: " + l.getId());
+                    continue;
+                }
+                this.lessons.add(l);
+            }
             System.out.println("Loaded " + lessons.size() + " lessons.");
 
         } catch (IOException e) {
@@ -202,41 +227,35 @@ public class LessonService {
                 lesson.setTitle(node.get("title").asText());
             if (node.has("description"))
                 lesson.setDescription(node.get("description").asText());
+            if (node.has("draft"))
+                lesson.setDraft(node.get("draft").asBoolean());
         } catch (IOException e) {
             System.err.println("Error parsing lesson metadata for " + lesson.getId() + ": " + e.getMessage());
         }
     }
 
     private Step parseStep(Resource resource, String filename) throws IOException {
-        StringBuilder content = new StringBuilder();
-        StringBuilder frontMatter = new StringBuilder();
-        boolean inFrontMatter = false;
-        boolean hasFrontMatter = false;
-
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            int lineCount = 0;
-            while ((line = reader.readLine()) != null) {
-                lineCount++;
-                if (line.trim().equals("---")) {
-                    if (lineCount == 1) {
-                        inFrontMatter = true;
-                        hasFrontMatter = true;
-                        continue;
-                    }
-                    if (inFrontMatter) {
-                        inFrontMatter = false;
-                        continue;
-                    }
-                }
-
-                if (inFrontMatter) {
-                    frontMatter.append(line).append("\n");
-                } else {
-                    content.append(line).append("\n");
-                }
+        String fullContent;
+        if (resource.isFile()) {
+            fullContent = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+        } else {
+            try (InputStream is = resource.getInputStream()) {
+                fullContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             }
+        }
+
+        String frontMatter = "";
+        String content = "";
+
+        Matcher matcher = FRONTMATTER_PATTERN.matcher(fullContent);
+        if (matcher.find()) {
+            frontMatter = matcher.group(1);
+            content = matcher.group(2);
+            if (content == null) {
+                content = "";
+            }
+        } else {
+            content = fullContent;
         }
 
         Step step = new Step();
@@ -246,9 +265,13 @@ public class LessonService {
         // Default title from filename if not in frontmatter
         step.setTitle(formatTitle(baseName));
 
-        if (hasFrontMatter) {
+        if (!frontMatter.isBlank()) {
             try {
-                JsonNode node = yamlMapper.readTree(frontMatter.toString());
+                JsonNode node = yamlMapper.readTree(frontMatter);
+
+                if (node.has("draft") && node.get("draft").asBoolean() && !devMode) {
+                    return null;
+                }
 
                 if (this.schema != null) {
                     Set<ValidationMessage> errors = this.schema.validate(node);
@@ -281,7 +304,7 @@ public class LessonService {
         }
 
         // Send Raw Markdown to Frontend
-        step.setContent(content.toString());
+        step.setContent(content);
 
         if (step.getOrder() == null) {
             step.setOrder(Integer.MAX_VALUE);
@@ -322,6 +345,8 @@ public class LessonService {
 
         try {
             Process process = new ProcessBuilder("/bin/sh", "-c", step.getTestCommand())
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             int exitCode = process.waitFor();
             return exitCode == 0;
