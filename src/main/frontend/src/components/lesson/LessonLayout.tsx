@@ -12,7 +12,6 @@ interface LessonLayoutProps {
     onPrev: () => void;
     onNext: () => void;
     onSelectStep: (index: number) => void;
-    onRunCommand: (cmd: string) => void;
 }
 
 export default function LessonLayout({
@@ -23,7 +22,7 @@ export default function LessonLayout({
     onPrev,
     onNext,
     onSelectStep,
-    onRunCommand
+
 }: LessonLayoutProps) {
     return (
         <div className="flex flex-col h-screen w-screen bg-background text-foreground overflow-hidden font-sans">
@@ -39,7 +38,6 @@ export default function LessonLayout({
                             onPrev={onPrev}
                             onNext={onNext}
                             onSelectStep={onSelectStep}
-                            onRunCommand={onRunCommand}
                         />
                     </Panel>
 

@@ -282,8 +282,6 @@ public class LessonService {
 
                 if (node.has("title"))
                     step.setTitle(node.get("title").asText());
-                if (node.has("runCommand"))
-                    step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
                 if (node.has("before"))

@@ -47,9 +47,7 @@ export default function LessonView() {
         };
     }, [lessonId, lesson, currentStepIndex]);
 
-    const runCommand = (cmd: string) => {
-        window.dispatchEvent(new CustomEvent('terminal:input', { detail: cmd + '\r' }));
-    };
+
 
     const nextStep = () => {
         if (lesson && currentStepIndex < lesson.steps.length - 1) {
@@ -87,7 +85,6 @@ export default function LessonView() {
             onPrev={prevStep}
             onNext={nextStep}
             onSelectStep={jumpToStep}
-            onRunCommand={runCommand}
         />
     );
 }

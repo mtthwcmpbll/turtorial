@@ -10,7 +10,7 @@ export interface Step {
     id: string;
     title: string;
     content: string;
-    runCommand?: string;
+
     testCommand?: string;
     section?: string;
     quizzes?: QuizQuestion[];

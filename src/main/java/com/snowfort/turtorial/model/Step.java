@@ -4,7 +4,6 @@ public class Step {
     private String id;
     private String title;
     private String content;
-    private String runCommand;
     private String testCommand;
     private String beforeCommand;
     private String afterCommand;
@@ -34,14 +33,6 @@ public class Step {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getRunCommand() {
-        return runCommand;
-    }
-
-    public void setRunCommand(String runCommand) {
-        this.runCommand = runCommand;
     }
 
     public String getTestCommand() {

@@ -10,7 +10,6 @@ interface ContentPanelProps {
     onPrev: () => void;
     onNext: () => void;
     onSelectStep: (index: number) => void;
-    onRunCommand: (cmd: string) => void;
 }
 
 export default function ContentPanel({
@@ -20,7 +19,6 @@ export default function ContentPanel({
     onPrev,
     onNext,
     onSelectStep,
-    onRunCommand
 }: ContentPanelProps) {
     const currentStep = lesson.steps[stepIndex];
 
@@ -43,8 +41,6 @@ export default function ContentPanel({
                 />
                 <ContentSection
                     content={currentStep.content}
-                    runCommand={currentStep.runCommand}
-                    onRunCommand={onRunCommand}
                     quizzes={currentStep.quizzes}
                 />
             </div>
