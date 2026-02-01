@@ -1,6 +1,5 @@
 package com.snowfort.turtorial.service;
 
-import com.snowfort.turtorial.model.Lesson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,18 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
-import static org.mockito.Mockito.*;
-
 public class LessonServiceBlockingTest {
-
-    private Environment mockEnv;
 
     @BeforeEach
     public void setup() {
-        mockEnv = mock(Environment.class);
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
+        // No environment mocking needed anymore
     }
 
     @Test
@@ -30,7 +22,8 @@ public class LessonServiceBlockingTest {
         Path lessonDir = tempDir.resolve("lessons/blocking-lesson");
         Files.createDirectories(lessonDir);
 
-        // A command that produces enough output to fill the buffer (typically 64KB on Linux)
+        // A command that produces enough output to fill the buffer (typically 64KB on
+        // Linux)
         // yes prints the string repeatedly. head limits the output.
         // 30 chars + newline = 31 bytes per line.
         // 5000 lines * 31 bytes = 155,000 bytes > 64KB.
@@ -47,8 +40,7 @@ public class LessonServiceBlockingTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                false,
-                mockEnv);
+                false);
         service.init();
 
         // Ensure the lesson is loaded

@@ -1,0 +1,24 @@
+---
+title: Lifecycle Scripts
+before: echo "I was created by the before script!" > /tmp/turtorial-demo.txt
+after: rm /tmp/turtorial-demo.txt
+---
+
+# Lifecycle Scripts
+
+Turtorial allows you to define **lifecycle scripts** for each step. These scripts run automatically when you enter or leave a step.
+
+- **`before`**: Runs when the step is loaded. Useful for setting up the environment (creating files, starting services).
+- **`after`**: Runs when you navigate away from the step. Useful for cleanup.
+
+## Try it out!
+
+In this step, we've defined a `before` script that creates a file at `/tmp/turtorial-demo.txt`.
+
+Verify it exists by running:
+
+```bash
+cat /tmp/turtorial-demo.txt
+```
+
+When you move to the next or previous step, the `after` script will automatically remove this file!

@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -33,7 +31,6 @@ public class LessonService {
     private final List<Lesson> lessons = new ArrayList<>();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     private final String lessonsDirectory;
-    private final Environment env;
     private final boolean devMode;
 
     private static final Pattern FRONTMATTER_PATTERN = Pattern.compile(
@@ -45,12 +42,10 @@ public class LessonService {
     public LessonService(
             @Value("${turtorial.lessons.directory}") String lessonsDirectory,
             @Value("${turtorial.dev-mode:false}") boolean devMode,
-            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError,
-            Environment env) {
+            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError) {
         this.lessonsDirectory = lessonsDirectory;
         this.devMode = devMode;
         this.failOnError = failOnError;
-        this.env = env;
     }
 
     @PostConstruct
@@ -169,10 +164,8 @@ public class LessonService {
 
             this.lessons.clear();
 
-            boolean isProduction = env.acceptsProfiles(Profiles.of("prod"));
-
             for (Lesson l : lessonMap.values()) {
-                if (l.isDraft() && isProduction) {
+                if (l.isDraft() && !devMode) {
                     System.out.println("Skipping draft lesson: " + l.getId());
                     continue;
                 }
@@ -293,6 +286,10 @@ public class LessonService {
                     step.setRunCommand(node.get("runCommand").asText());
                 if (node.has("testCommand"))
                     step.setTestCommand(node.get("testCommand").asText());
+                if (node.has("before"))
+                    step.setBeforeCommand(node.get("before").asText());
+                if (node.has("after"))
+                    step.setAfterCommand(node.get("after").asText());
                 if (node.has("order"))
                     step.setOrder(node.get("order").asInt());
                 if (node.has("section"))
@@ -342,21 +339,49 @@ public class LessonService {
     }
 
     public boolean verifyStep(String lessonId, String stepId) {
-        Lesson lesson = findById(lessonId);
-        if (lesson == null)
-            return false;
-
-        Step step = lesson.getSteps().stream()
-                .filter(s -> s.getId().equals(stepId))
-                .findFirst()
-                .orElse(null);
+        Step step = findStep(lessonId, stepId);
 
         if (step == null || step.getTestCommand() == null || step.getTestCommand().isEmpty()) {
             return true;
         }
 
+        return runCommand(step.getTestCommand());
+    }
+
+    public boolean runBeforeStep(String lessonId, String stepId) {
+        Step step = findStep(lessonId, stepId);
+
+        if (step == null || step.getBeforeCommand() == null || step.getBeforeCommand().isEmpty()) {
+            return true;
+        }
+
+        return runCommand(step.getBeforeCommand());
+    }
+
+    public boolean runAfterStep(String lessonId, String stepId) {
+        Step step = findStep(lessonId, stepId);
+
+        if (step == null || step.getAfterCommand() == null || step.getAfterCommand().isEmpty()) {
+            return true;
+        }
+
+        return runCommand(step.getAfterCommand());
+    }
+
+    private Step findStep(String lessonId, String stepId) {
+        Lesson lesson = findById(lessonId);
+        if (lesson == null)
+            return null;
+
+        return lesson.getSteps().stream()
+                .filter(s -> s.getId().equals(stepId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private boolean runCommand(String command) {
         try {
-            Process process = new ProcessBuilder("/bin/sh", "-c", step.getTestCommand())
+            Process process = new ProcessBuilder("/bin/sh", "-c", command)
                     .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                     .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();

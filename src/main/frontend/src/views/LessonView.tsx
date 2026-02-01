@@ -29,6 +29,24 @@ export default function LessonView() {
         }
     }, [lessonId]);
 
+    // Lifecycle hooks for steps (runBefore / runAfter)
+    useEffect(() => {
+        if (!lesson || !lesson.steps[currentStepIndex]) return;
+
+        const step = lesson.steps[currentStepIndex];
+        const stepId = step.id;
+
+        // Run "before" script
+        fetch(`/api/lessons/${lessonId}/steps/${stepId}/runBefore`, { method: 'POST' })
+            .catch(err => console.error("Failed to run before script", err));
+
+        return () => {
+            // Run "after" script on cleanup
+            fetch(`/api/lessons/${lessonId}/steps/${stepId}/runAfter`, { method: 'POST' })
+                .catch(err => console.error("Failed to run after script", err));
+        };
+    }, [lessonId, lesson, currentStepIndex]);
+
     const runCommand = (cmd: string) => {
         window.dispatchEvent(new CustomEvent('terminal:input', { detail: cmd + '\r' }));
     };
