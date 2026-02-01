@@ -3,8 +3,13 @@ package com.snowfort.turtorial.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersion;
+import com.networknt.schema.ValidationMessage;
 import com.snowfort.turtorial.model.Lesson;
 import com.snowfort.turtorial.model.Step;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
@@ -31,22 +36,39 @@ public class LessonService {
 
     private static final Pattern FRONTMATTER_PATTERN = Pattern.compile(
             "^---\\s*\\R(.*?)\\R---\\s*(?:\\R(.*))?$",
-            Pattern.DOTALL | Pattern.MULTILINE
-    );
+            Pattern.DOTALL | Pattern.MULTILINE);
+    private final boolean failOnError;
+    private JsonSchema schema;
 
     public LessonService(
-            @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.directory}") String lessonsDirectory,
-            @org.springframework.beans.factory.annotation.Value("${turtorial.dev-mode:false}") boolean devMode,
+            @Value("${turtorial.lessons.directory}") String lessonsDirectory,
+            @Value("${turtorial.dev-mode:false}") boolean devMode,
+            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError,
             Environment env) {
         this.lessonsDirectory = lessonsDirectory;
         this.devMode = devMode;
+        this.failOnError = failOnError;
         this.env = env;
     }
 
     @PostConstruct
     public void init() {
         System.out.println("Turtorial Dev Mode: " + devMode);
+        loadSchema();
         loadLessons();
+    }
+
+    private void loadSchema() {
+        try (InputStream is = getClass().getResourceAsStream("/schemas/lesson-frontmatter.schema.json")) {
+            if (is != null) {
+                JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7);
+                this.schema = factory.getSchema(is);
+            } else {
+                System.err.println("Could not find frontmatter schema at /schemas/lesson-frontmatter.schema.json");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load frontmatter schema: " + e.getMessage());
+        }
     }
 
     public void loadLessons() {
@@ -131,6 +153,9 @@ public class LessonService {
                         }
                     }
                 } catch (Exception e) {
+                    if (failOnError) {
+                        throw new RuntimeException("Failed to process resource: " + resource.getDescription(), e);
+                    }
                     System.err.println(
                             "Failed to process resource: " + resource.getDescription() + ". Error: " + e.getMessage());
                 }
@@ -214,9 +239,9 @@ public class LessonService {
         if (resource.isFile()) {
             fullContent = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
         } else {
-             try (InputStream is = resource.getInputStream()) {
-                 fullContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-             }
+            try (InputStream is = resource.getInputStream()) {
+                fullContent = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            }
         }
 
         String frontMatter = "";
@@ -243,9 +268,23 @@ public class LessonService {
         if (!frontMatter.isBlank()) {
             try {
                 JsonNode node = yamlMapper.readTree(frontMatter);
+
                 if (node.has("draft") && node.get("draft").asBoolean() && !devMode) {
                     return null;
                 }
+
+                if (this.schema != null) {
+                    Set<ValidationMessage> errors = this.schema.validate(node);
+                    if (!errors.isEmpty()) {
+                        String errorMessage = "Frontmatter validation errors for " + filename + ": " + errors;
+                        if (failOnError) {
+                            throw new RuntimeException(errorMessage);
+                        } else {
+                            System.err.println(errorMessage);
+                        }
+                    }
+                }
+
                 if (node.has("title"))
                     step.setTitle(node.get("title").asText());
                 if (node.has("runCommand"))
@@ -257,6 +296,9 @@ public class LessonService {
                 if (node.has("section"))
                     step.setSection(node.get("section").asText());
             } catch (Exception e) {
+                if (failOnError) {
+                    throw new RuntimeException("Error parsing YAML for " + filename, e);
+                }
                 System.err.println("Error parsing YAML for " + filename + ": " + e.getMessage());
             }
         }

@@ -44,7 +44,11 @@ public class LessonServiceBlockingTest {
                 "# Content";
         Files.writeString(step1, content);
 
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, mockEnv);
+        LessonService service = new LessonService(
+                tempDir.resolve("lessons").toUri().toString(),
+                false,
+                false,
+                mockEnv);
         service.init();
 
         // Ensure the lesson is loaded
