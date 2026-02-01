@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +26,8 @@ public class LessonServiceCommandTest {
         String afterCmd = "touch " + cleanupFile.toAbsolutePath();
 
         Path step1 = lessonDir.resolve("step1.md");
-        Files.writeString(step1, String.format("---\ntitle: Cmd Step\nbefore: %s\nafter: %s\n---\n# Content", beforeCmd, afterCmd));
+        Files.writeString(step1,
+                String.format("---\ntitle: Cmd Step\nbefore: %s\nafter: %s\n---\n# Content", beforeCmd, afterCmd));
 
         // Initialize service
         LessonService service = new LessonService(
@@ -44,13 +44,13 @@ public class LessonServiceCommandTest {
 
         // Verify prepareStep
         Assertions.assertFalse(Files.exists(prepareFile), "Prepare file should not exist yet");
-        boolean prepareResult = service.prepareStep(lessonId, stepId);
+        boolean prepareResult = service.runBeforeStep(lessonId, stepId);
         Assertions.assertTrue(prepareResult, "Prepare step should succeed");
         Assertions.assertTrue(Files.exists(prepareFile), "Prepare file should exist after prepareStep");
 
         // Verify cleanupStep
         Assertions.assertFalse(Files.exists(cleanupFile), "Cleanup file should not exist yet");
-        boolean cleanupResult = service.cleanupStep(lessonId, stepId);
+        boolean cleanupResult = service.runAfterStep(lessonId, stepId);
         Assertions.assertTrue(cleanupResult, "Cleanup step should succeed");
         Assertions.assertTrue(Files.exists(cleanupFile), "Cleanup file should exist after cleanupStep");
     }

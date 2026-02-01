@@ -14,19 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import static org.mockito.Mockito.*;
 
 public class LessonServiceTest {
 
-    private Environment mockEnv;
-
     @BeforeEach
     public void setup() {
-        mockEnv = mock(Environment.class);
-        // Default behavior: not production
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
+        // No environment mocking needed anymore
     }
 
     @Test
@@ -42,8 +36,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -71,8 +64,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -102,8 +94,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 true,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -143,8 +134,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -177,8 +167,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 true,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -203,8 +192,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -222,14 +210,11 @@ public class LessonServiceTest {
         Path step1 = lessonDir.resolve("step1.md");
         Files.writeString(step1, "# Content");
 
-        // Mock production environment
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(true);
-
+        // devMode = false (simulating production behavior for draft hiding)
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                false,
-                mockEnv);
+                false);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -247,14 +232,11 @@ public class LessonServiceTest {
         Path step1 = lessonDir.resolve("step1.md");
         Files.writeString(step1, "# Content");
 
-        // Mock dev environment (not production)
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
-
+        // devMode = true (simulating dev behavior for showing drafts)
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
-                false,
                 true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -277,8 +259,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -304,8 +285,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 true,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -327,8 +307,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();
@@ -336,7 +315,6 @@ public class LessonServiceTest {
 
         Lesson lesson = lessons.get(0);
         Assertions.assertEquals(1, lesson.getSteps().size());
-
 
         Step step = lesson.getSteps().get(0);
         Assertions.assertEquals("Only Metadata", step.getTitle());
@@ -355,8 +333,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 true,
-                true,
-                mockEnv);
+                true);
 
         Assertions.assertThrows(RuntimeException.class, () -> service.init());
     }
@@ -372,8 +349,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 false,
-                false,
-                mockEnv);
+                false);
 
         // Should not throw
         service.init();
@@ -409,8 +385,7 @@ public class LessonServiceTest {
         LessonService service = new LessonService(
                 tempDir.resolve("lessons").toUri().toString(),
                 true,
-                true,
-                mockEnv);
+                true);
         service.init();
 
         List<Lesson> lessons = service.findAll();

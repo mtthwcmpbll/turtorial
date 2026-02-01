@@ -32,13 +32,13 @@ public class LessonController {
         return lessonService.verifyStep(lessonId, stepId);
     }
 
-    @PostMapping("/{lessonId}/steps/{stepId}/prepare")
-    public boolean prepareStep(@PathVariable String lessonId, @PathVariable String stepId) {
-        return lessonService.prepareStep(lessonId, stepId);
+    @PostMapping("/{lessonId}/steps/{stepId}/runBefore")
+    public boolean runBeforeStep(@PathVariable String lessonId, @PathVariable String stepId) {
+        return lessonService.runBeforeStep(lessonId, stepId);
     }
 
-    @PostMapping("/{lessonId}/steps/{stepId}/cleanup")
-    public boolean cleanupStep(@PathVariable String lessonId, @PathVariable String stepId) {
-        return lessonService.cleanupStep(lessonId, stepId);
+    @PostMapping("/{lessonId}/steps/{stepId}/runAfter")
+    public boolean runAfterStep(@PathVariable String lessonId, @PathVariable String stepId) {
+        return lessonService.runAfterStep(lessonId, stepId);
     }
 }

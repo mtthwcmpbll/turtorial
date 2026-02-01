@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -33,7 +31,6 @@ public class LessonService {
     private final List<Lesson> lessons = new ArrayList<>();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     private final String lessonsDirectory;
-    private final Environment env;
     private final boolean devMode;
 
     private static final Pattern FRONTMATTER_PATTERN = Pattern.compile(
@@ -45,12 +42,10 @@ public class LessonService {
     public LessonService(
             @Value("${turtorial.lessons.directory}") String lessonsDirectory,
             @Value("${turtorial.dev-mode:false}") boolean devMode,
-            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError,
-            Environment env) {
+            @Value("${turtorial.lessons.frontmatter.validation.fail-on-error:true}") boolean failOnError) {
         this.lessonsDirectory = lessonsDirectory;
         this.devMode = devMode;
         this.failOnError = failOnError;
-        this.env = env;
     }
 
     @PostConstruct
@@ -169,10 +164,8 @@ public class LessonService {
 
             this.lessons.clear();
 
-            boolean isProduction = env.acceptsProfiles(Profiles.of("prod"));
-
             for (Lesson l : lessonMap.values()) {
-                if (l.isDraft() && isProduction) {
+                if (l.isDraft() && !devMode) {
                     System.out.println("Skipping draft lesson: " + l.getId());
                     continue;
                 }
@@ -355,7 +348,7 @@ public class LessonService {
         return runCommand(step.getTestCommand());
     }
 
-    public boolean prepareStep(String lessonId, String stepId) {
+    public boolean runBeforeStep(String lessonId, String stepId) {
         Step step = findStep(lessonId, stepId);
 
         if (step == null || step.getBeforeCommand() == null || step.getBeforeCommand().isEmpty()) {
@@ -365,7 +358,7 @@ public class LessonService {
         return runCommand(step.getBeforeCommand());
     }
 
-    public boolean cleanupStep(String lessonId, String stepId) {
+    public boolean runAfterStep(String lessonId, String stepId) {
         Step step = findStep(lessonId, stepId);
 
         if (step == null || step.getAfterCommand() == null || step.getAfterCommand().isEmpty()) {
