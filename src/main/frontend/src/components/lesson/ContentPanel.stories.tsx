@@ -13,7 +13,6 @@ const meta = {
         onPrev: { action: 'prev' },
         onNext: { action: 'next' },
         onSelectStep: { action: 'select step' },
-        onRunCommand: { action: 'run command' },
     },
     decorators: [
         (Story) => (
@@ -32,10 +31,10 @@ const mockLesson: Lesson = {
     title: 'Linux Basics',
     steps: [
         {
-            id: '1-1', title: 'Introduction', content: '# Intro\n\nWelcome to Linux.', runCommand: 'echo "hello"'
+            id: '1-1', title: 'Introduction', content: '# Intro\n\nWelcome to Linux.'
         },
         {
-            id: '1-2', title: 'Listing Files', content: '# ls Command\n\nUse ls to list files.', runCommand: 'ls -la'
+            id: '1-2', title: 'Listing Files', content: '# ls Command\n\nUse ls to list files.'
         },
     ],
 };
@@ -48,6 +47,5 @@ export const Default: Story = {
         onPrev: () => { },
         onNext: () => { },
         onSelectStep: () => { },
-        onRunCommand: () => { },
     },
 };

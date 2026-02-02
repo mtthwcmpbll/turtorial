@@ -5,9 +5,7 @@ const meta = {
     title: 'Lesson/ContentSection',
     component: ContentSection,
     tags: ['autodocs'],
-    argTypes: {
-        onRunCommand: { action: 'run command' },
-    },
+
     decorators: [
         (Story) => (
             <div className="h-[500px] border border-border">
@@ -44,14 +42,26 @@ echo "Hello World"
 export const Default: Story = {
     args: {
         content: sampleMarkdown,
-        runCommand: 'ls -la',
-        onRunCommand: () => { },
     },
 };
 
-export const NoRunCommand: Story = {
+export const WithQuiz: Story = {
     args: {
         content: sampleMarkdown,
-        onRunCommand: () => { },
+        quizzes: [
+            {
+                question: 'What command lists files?',
+                type: 'CHOICE',
+                options: ['ls', 'cd', 'mkdir'],
+                correctAnswer: 'ls'
+            },
+            {
+                question: 'Type "hello"',
+                type: 'TEXT',
+                validationRegex: '^hello$'
+            }
+        ]
     },
 };
+
+
