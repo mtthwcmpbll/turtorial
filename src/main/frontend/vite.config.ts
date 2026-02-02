@@ -31,6 +31,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
+      'react/jsx-dev-runtime',
       '@testing-library/react',
       '@testing-library/dom',
       '@testing-library/user-event',
