@@ -14,7 +14,7 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: '127.0.0.1',
+    host: 'localhost',
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8080',
@@ -30,7 +30,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['@testing-library/react', '@testing-library/dom']
+    include: ['@testing-library/react', '@testing-library/dom', '@testing-library/user-event']
   },
   test: {
     projects: [{
