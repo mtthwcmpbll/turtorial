@@ -1,9 +1,13 @@
 import { useState, useRef } from 'react';
 import { RefreshCw, ArrowRight, Globe } from 'lucide-react';
 
-export default function BrowserPanel() {
-    const [url, setUrl] = useState('https://example.com');
-    const [inputUrl, setInputUrl] = useState('https://example.com');
+interface BrowserPanelProps {
+    initialUrl?: string;
+}
+
+export default function BrowserPanel({ initialUrl = 'https://example.com' }: BrowserPanelProps) {
+    const [url, setUrl] = useState(initialUrl);
+    const [inputUrl, setInputUrl] = useState(initialUrl);
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
     const handleSubmit = (e: React.FormEvent) => {

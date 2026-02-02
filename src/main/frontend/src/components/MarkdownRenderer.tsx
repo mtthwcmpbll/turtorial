@@ -69,6 +69,18 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                         return <div className={className} {...props}>{children}</div>;
                     },
 
+                    // Custom rendering for links to support opening in internal browser
+                    a: ({ node, ...props }) => {
+                        const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                            const href = props.href;
+                            if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+                                e.preventDefault();
+                                window.dispatchEvent(new CustomEvent('browser:open', { detail: href }));
+                            }
+                        };
+                        return <a {...props} onClick={handleClick} className="text-blue-500 hover:underline cursor-pointer" />;
+                    },
+
                     // Custom rendering for blockquotes to support GitHub Alerts (e.g. > [!NOTE])
                     blockquote: ({ children, node, ...props }) => {
                         // Helper to find the alert type from the first paragraph

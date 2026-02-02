@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Terminal, Plus, X, Globe } from 'lucide-react';
@@ -15,24 +15,47 @@ interface Tab {
     id: string;
     type: 'terminal' | 'browser';
     title: string;
+    url?: string;
 }
 
-export default function TabbedPane() {
-    const [tabs, setTabs] = useState<Tab[]>([
+interface TabbedPaneProps {
+    initialTabs?: Tab[];
+}
+
+export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
+    const [tabs, setTabs] = useState<Tab[]>(initialTabs || [
         { id: 'term-1', type: 'terminal', title: 'Terminal' }
     ]);
-    const [activeTabId, setActiveTabId] = useState('term-1');
+    const [activeTabId, setActiveTabId] = useState(
+        (initialTabs && initialTabs.length > 0) ? initialTabs[0].id : (initialTabs ? '' : 'term-1')
+    );
 
-    const addTab = (type: 'terminal' | 'browser') => {
+    // Use refs to access latest state in event handlers without re-binding listeners
+    const tabsRef = useRef(tabs);
+    const activeTabIdRef = useRef(activeTabId);
+
+
+
+    const addTab = useCallback((type: 'terminal' | 'browser', url?: string) => {
         const id = `${type === 'terminal' ? 'term' : 'browser'}-${Date.now()}`;
         const newTab: Tab = {
             id,
             type,
-            title: type === 'terminal' ? 'Terminal' : 'Browser'
+            title: type === 'terminal' ? 'Terminal' : 'Browser',
+            url
         };
-        setTabs([...tabs, newTab]);
+        setTabs(prev => {
+            if (prev.some(t => t.id === id)) return prev;
+            return [...prev, newTab];
+        });
         setActiveTabId(id);
-    };
+    }, []);
+
+    // Update refs when state changes
+    useLayoutEffect(() => {
+        tabsRef.current = tabs;
+        activeTabIdRef.current = activeTabId;
+    }, [tabs, activeTabId]);
 
     const removeTab = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -46,6 +69,58 @@ export default function TabbedPane() {
             setActiveTabId('');
         }
     };
+
+    const handleBrowserOpen = useCallback((e: Event) => {
+        e.stopImmediatePropagation();
+        const customEvent = e as CustomEvent;
+        addTab('browser', customEvent.detail);
+    }, [addTab]);
+
+    const handleRunCommand = useCallback((e: Event) => {
+        e.stopImmediatePropagation();
+        const customEvent = e as CustomEvent;
+        const command = customEvent.detail;
+
+        // Access latest state via refs
+        const currentTabs = tabsRef.current;
+        const currentActiveId = activeTabIdRef.current;
+
+        // Find existing terminal tab
+        let termTab = currentTabs.find(t => t.type === 'terminal');
+
+        // If active tab is a terminal, use that one (logic: if multiple, use focused)
+        const activeTab = currentTabs.find(t => t.id === currentActiveId);
+        if (activeTab && activeTab.type === 'terminal') {
+            termTab = activeTab;
+        }
+
+        if (termTab) {
+            // Switch to it
+            setActiveTabId(termTab.id);
+            // Dispatch input event after a short delay to ensure render/focus
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('terminal:input', { detail: command + '\r' }));
+            }, 100);
+        } else {
+            // Create new terminal tab
+            addTab('terminal');
+            // The new tab becomes active synchronously in addTab, but we need to wait for mount
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('terminal:input', { detail: command + '\r' }));
+            }, 200); // Slightly longer delay for mount
+        }
+    }, [addTab]);
+
+    // Listen for custom events from lesson content
+    useEffect(() => {
+        window.addEventListener('browser:open', handleBrowserOpen);
+        window.addEventListener('terminal:run-command', handleRunCommand);
+
+        return () => {
+            window.removeEventListener('browser:open', handleBrowserOpen);
+            window.removeEventListener('terminal:run-command', handleRunCommand);
+        };
+    }, [handleBrowserOpen, handleRunCommand]);
 
     return (
         <Tabs.Root
@@ -144,8 +219,8 @@ export default function TabbedPane() {
                         forceMount
                         className="h-full w-full data-[state=inactive]:hidden"
                     >
-                        {tab.type === 'terminal' && <TerminalPanel />}
-                        {tab.type === 'browser' && <BrowserPanel />}
+                        {tab.type === 'terminal' && <TerminalPanel onOpenUrl={(url) => addTab('browser', url)} />}
+                        {tab.type === 'browser' && <BrowserPanel initialUrl={tab.url} />}
                     </Tabs.Content>
                 ))}
             </div>
