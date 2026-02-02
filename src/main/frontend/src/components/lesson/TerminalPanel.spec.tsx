@@ -8,22 +8,22 @@ const mockSend = vi.fn();
 const mockClose = vi.fn();
 
 class MockWebSocket {
-  send = mockSend;
-  close = mockClose;
-  readyState = WebSocket.OPEN;
-  url: string;
-  constructor(url: string) {
-    this.url = url;
-    setTimeout(() => {
-        if (this.onopen) {
-             this.onopen(new Event('open'));
-        }
-    }, 0);
-  }
-  onopen: ((e: Event) => void) | null = null;
-  onmessage: ((e: MessageEvent) => void) | null = null;
-  onclose: ((e: CloseEvent) => void) | null = null;
-  onerror: ((e: Event) => void) | null = null;
+    send = mockSend;
+    close = mockClose;
+    readyState = WebSocket.OPEN;
+    url: string;
+    constructor(url: string) {
+        this.url = url;
+        setTimeout(() => {
+            if (this.onopen) {
+                this.onopen(new Event('open'));
+            }
+        }, 0);
+    }
+    onopen: ((e: Event) => void) | null = null;
+    onmessage: ((e: MessageEvent) => void) | null = null;
+    onclose: ((e: CloseEvent) => void) | null = null;
+    onerror: ((e: Event) => void) | null = null;
 }
 
 describe('TerminalPanel', () => {

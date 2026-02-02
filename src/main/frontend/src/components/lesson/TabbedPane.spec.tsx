@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, cleanup, waitFor, act } from '@testing-library/react';
 import { vi, describe, it, expect, afterEach, beforeEach } from 'vitest';
 import TabbedPane from './TabbedPane';
-import React from 'react';
+import { type ReactNode } from 'react';
 
 // Mock TerminalPanel to avoid xterm setup
 vi.mock('./TerminalPanel', () => ({
@@ -15,11 +15,11 @@ vi.mock('./BrowserPanel', () => ({
 
 // Mock DropdownMenu to avoid Radix UI Context/React version issues in tests
 vi.mock('@radix-ui/react-dropdown-menu', () => ({
-  Root: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Trigger: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Portal: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Content: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Item: ({ children, onSelect }: { children: React.ReactNode; onSelect?: () => void }) => (
+  Root: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Trigger: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Portal: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Content: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Item: ({ children, onSelect }: { children: ReactNode; onSelect?: () => void }) => (
     <div role="menuitem" onClick={onSelect}>
       {children}
     </div>
