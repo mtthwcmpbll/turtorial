@@ -30,7 +30,16 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['@testing-library/react', '@testing-library/dom', '@testing-library/user-event']
+    include: [
+      '@testing-library/react',
+      '@testing-library/dom',
+      '@testing-library/user-event',
+      'lucide-react',
+      'clsx',
+      'tailwind-merge',
+      'react-dom'
+    ],
+    force: true
   },
   test: {
     projects: [{
