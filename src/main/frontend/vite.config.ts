@@ -14,7 +14,7 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: 'localhost',
+    host: true, // Listen on all addresses (0.0.0.0)
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8080',
