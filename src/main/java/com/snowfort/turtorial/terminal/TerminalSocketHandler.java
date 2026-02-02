@@ -51,8 +51,29 @@ public class TerminalSocketHandler extends TextWebSocketHandler {
 
             sessions.put(session.getId(), process);
 
-            // Initial window size
-            process.setWinSize(new WinSize(80, 24));
+            // Initial window size with retry logic to handle potential race condition
+            int retries = 3;
+            for (int i = 0; i < retries; i++) {
+                try {
+                    process.setWinSize(new WinSize(80, 24));
+                    if (i > 0) {
+                        log.info("Successfully set window size on attempt " + (i + 1));
+                    }
+                    break;
+                } catch (Exception e) {
+                    if (i == retries - 1) {
+                        log.warn("Failed to set window size after " + retries
+                                + " attempts. Terminal may have incorrect dimensions. Error: " + e.getMessage());
+                    } else {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    }
+                }
+            }
 
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             sessionThreads.put(session.getId(), executor);

@@ -8,7 +8,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+    return twMerge(clsx(inputs));
 }
 
 interface Tab {
@@ -43,7 +43,7 @@ export default function TabbedPane() {
         if (activeTabId === id && newTabs.length > 0) {
             setActiveTabId(newTabs[newTabs.length - 1].id);
         } else if (newTabs.length === 0) {
-             setActiveTabId('');
+            setActiveTabId('');
         }
     };
 
@@ -53,17 +53,19 @@ export default function TabbedPane() {
             onValueChange={setActiveTabId}
             className="flex flex-col h-full w-full bg-[#1e1e1e]"
         >
-            <div className="flex items-center border-b border-white/10 bg-[#252526]">
-                <Tabs.List className="flex flex-1 overflow-x-auto no-scrollbar">
+            <div className="flex items-center bg-[#252526] pt-1.5 px-2 border-b border-white/10">
+                <Tabs.List className="flex flex-1 overflow-x-auto no-scrollbar items-end gap-1">
                     {tabs.map((tab) => (
                         <Tabs.Trigger
                             key={tab.id}
                             value={tab.id}
                             className={cn(
-                                "group flex items-center gap-2 px-3 py-2 text-sm text-gray-400 border-r border-white/5 select-none cursor-pointer min-w-[120px] justify-between",
-                                "hover:bg-[#2a2d2e] hover:text-gray-200",
-                                "data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-t-2 data-[state=active]:border-t-blue-500",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 inset-ring"
+                                "group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between",
+                                "rounded-t-md border-t border-x border-transparent relative -bottom-[1px]",
+                                "text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200",
+                                "data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white",
+                                "data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e]",
+                                "focus-visible:outline-none z-10"
                             )}
                         >
                             <div className="flex items-center gap-2 overflow-hidden">
@@ -117,7 +119,7 @@ export default function TabbedPane() {
 
             <div className="flex-1 relative min-h-0">
                 {tabs.length === 0 && (
-                     <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4">
+                    <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4">
                         <p>No open tabs</p>
                         <div className="flex gap-2">
                             <button
@@ -133,7 +135,7 @@ export default function TabbedPane() {
                                 Open Browser
                             </button>
                         </div>
-                     </div>
+                    </div>
                 )}
                 {tabs.map((tab) => (
                     <Tabs.Content
@@ -142,8 +144,8 @@ export default function TabbedPane() {
                         forceMount
                         className="h-full w-full data-[state=inactive]:hidden"
                     >
-                         {tab.type === 'terminal' && <TerminalPanel />}
-                         {tab.type === 'browser' && <BrowserPanel />}
+                        {tab.type === 'terminal' && <TerminalPanel />}
+                        {tab.type === 'browser' && <BrowserPanel />}
                     </Tabs.Content>
                 ))}
             </div>
