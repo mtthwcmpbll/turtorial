@@ -1,7 +1,7 @@
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import LessonPageHeader from './LessonPageHeader';
 import ContentPanel from './ContentPanel';
-import TerminalPanel from './TerminalPanel';
+import TabbedPane from './TabbedPane';
 import type { Lesson } from '../../types';
 
 interface LessonLayoutProps {
@@ -47,7 +47,7 @@ export default function LessonLayout({
 
                     <Panel className="flex flex-col min-w-[300px] border-l border-border bg-[#1e1e1e]">
                         <div className="flex-1 min-h-0">
-                            <TerminalPanel />
+                            <TabbedPane />
                         </div>
                     </Panel>
                 </PanelGroup>

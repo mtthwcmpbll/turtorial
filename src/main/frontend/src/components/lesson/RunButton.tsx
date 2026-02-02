@@ -10,7 +10,8 @@ export default function RunButton({ command, onClick }: RunButtonProps) {
         if (onClick) {
             onClick();
         } else {
-            window.dispatchEvent(new CustomEvent('terminal:input', { detail: command + '\r' }));
+            // Dispatch a specific event for running commands so the workspace handles tab interactions
+            window.dispatchEvent(new CustomEvent('terminal:run-command', { detail: command }));
         }
     };
 

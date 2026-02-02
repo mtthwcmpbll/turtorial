@@ -1,0 +1,229 @@
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
+import * as Tabs from '@radix-ui/react-tabs';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Terminal, Plus, X, Globe } from 'lucide-react';
+import TerminalPanel from './TerminalPanel';
+import BrowserPanel from './BrowserPanel';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
+
+interface Tab {
+    id: string;
+    type: 'terminal' | 'browser';
+    title: string;
+    url?: string;
+}
+
+interface TabbedPaneProps {
+    initialTabs?: Tab[];
+}
+
+export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
+    const [tabs, setTabs] = useState<Tab[]>(initialTabs || [
+        { id: 'term-1', type: 'terminal', title: 'Terminal' }
+    ]);
+    const [activeTabId, setActiveTabId] = useState(
+        (initialTabs && initialTabs.length > 0) ? initialTabs[0].id : (initialTabs ? '' : 'term-1')
+    );
+
+    // Use refs to access latest state in event handlers without re-binding listeners
+    const tabsRef = useRef(tabs);
+    const activeTabIdRef = useRef(activeTabId);
+
+
+
+    const addTab = useCallback((type: 'terminal' | 'browser', url?: string) => {
+        const id = `${type === 'terminal' ? 'term' : 'browser'}-${Date.now()}`;
+        const newTab: Tab = {
+            id,
+            type,
+            title: type === 'terminal' ? 'Terminal' : 'Browser',
+            url
+        };
+        setTabs(prev => {
+            if (prev.some(t => t.id === id)) return prev;
+            return [...prev, newTab];
+        });
+        setActiveTabId(id);
+    }, []);
+
+    // Update refs when state changes
+    useLayoutEffect(() => {
+        tabsRef.current = tabs;
+        activeTabIdRef.current = activeTabId;
+    }, [tabs, activeTabId]);
+
+    const removeTab = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        const newTabs = tabs.filter(t => t.id !== id);
+        setTabs(newTabs);
+
+        if (activeTabId === id && newTabs.length > 0) {
+            setActiveTabId(newTabs[newTabs.length - 1].id);
+        } else if (newTabs.length === 0) {
+            setActiveTabId('');
+        }
+    };
+
+    const handleBrowserOpen = useCallback((e: Event) => {
+        e.stopImmediatePropagation();
+        const customEvent = e as CustomEvent;
+        addTab('browser', customEvent.detail);
+    }, [addTab]);
+
+    const handleRunCommand = useCallback((e: Event) => {
+        e.stopImmediatePropagation();
+        const customEvent = e as CustomEvent;
+        const command = customEvent.detail;
+
+        // Access latest state via refs
+        const currentTabs = tabsRef.current;
+        const currentActiveId = activeTabIdRef.current;
+
+        // Find existing terminal tab
+        let termTab = currentTabs.find(t => t.type === 'terminal');
+
+        // If active tab is a terminal, use that one (logic: if multiple, use focused)
+        const activeTab = currentTabs.find(t => t.id === currentActiveId);
+        if (activeTab && activeTab.type === 'terminal') {
+            termTab = activeTab;
+        }
+
+        if (termTab) {
+            // Switch to it
+            setActiveTabId(termTab.id);
+            // Dispatch input event after a short delay to ensure render/focus
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('terminal:input', { detail: command + '\r' }));
+            }, 100);
+        } else {
+            // Create new terminal tab
+            addTab('terminal');
+            // The new tab becomes active synchronously in addTab, but we need to wait for mount
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('terminal:input', { detail: command + '\r' }));
+            }, 200); // Slightly longer delay for mount
+        }
+    }, [addTab]);
+
+    // Listen for custom events from lesson content
+    useEffect(() => {
+        window.addEventListener('browser:open', handleBrowserOpen);
+        window.addEventListener('terminal:run-command', handleRunCommand);
+
+        return () => {
+            window.removeEventListener('browser:open', handleBrowserOpen);
+            window.removeEventListener('terminal:run-command', handleRunCommand);
+        };
+    }, [handleBrowserOpen, handleRunCommand]);
+
+    return (
+        <Tabs.Root
+            value={activeTabId}
+            onValueChange={setActiveTabId}
+            className="flex flex-col h-full w-full bg-[#1e1e1e]"
+        >
+            <div className="flex items-center bg-[#252526] pt-1.5 px-2 border-b border-white/10">
+                <Tabs.List className="flex flex-1 overflow-x-auto no-scrollbar items-end gap-1">
+                    {tabs.map((tab) => (
+                        <Tabs.Trigger
+                            key={tab.id}
+                            value={tab.id}
+                            className={cn(
+                                "group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between",
+                                "rounded-t-md border-t border-x border-transparent relative -bottom-[1px]",
+                                "text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200",
+                                "data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white",
+                                "data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e]",
+                                "focus-visible:outline-none z-10"
+                            )}
+                        >
+                            <div className="flex items-center gap-2 overflow-hidden">
+                                {tab.type === 'terminal' ? <Terminal size={14} className="shrink-0" /> : <Globe size={14} className="shrink-0" />}
+                                <span className="truncate">{tab.title}</span>
+                            </div>
+                            <div
+                                role="button"
+                                className="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+                                onClick={(e) => removeTab(tab.id, e)}
+                            >
+                                <X size={12} />
+                            </div>
+                        </Tabs.Trigger>
+                    ))}
+                </Tabs.List>
+
+                <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                        <button
+                            className="flex items-center justify-center h-full px-3 text-gray-400 hover:text-white hover:bg-[#2a2d2e] border-l border-white/5 transition-colors focus:outline-none"
+                            title="New Tab"
+                        >
+                            <Plus size={16} />
+                        </button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                            className="min-w-[160px] bg-[#252526] rounded-md border border-white/10 shadow-lg p-1 z-50 text-sm"
+                            sideOffset={5}
+                            align="end"
+                        >
+                            <DropdownMenu.Item
+                                className="flex items-center gap-2 px-2 py-1.5 text-gray-200 rounded hover:bg-[#094771] hover:text-white outline-none cursor-pointer"
+                                onSelect={() => addTab('terminal')}
+                            >
+                                <Terminal size={14} />
+                                <span>Terminal</span>
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Item
+                                className="flex items-center gap-2 px-2 py-1.5 text-gray-200 rounded hover:bg-[#094771] hover:text-white outline-none cursor-pointer"
+                                onSelect={() => addTab('browser')}
+                            >
+                                <Globe size={14} />
+                                <span>Browser</span>
+                            </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+            </div>
+
+            <div className="flex-1 relative min-h-0">
+                {tabs.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4">
+                        <p>No open tabs</p>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => addTab('terminal')}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Open Terminal
+                            </button>
+                            <button
+                                onClick={() => addTab('browser')}
+                                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                            >
+                                Open Browser
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {tabs.map((tab) => (
+                    <Tabs.Content
+                        key={tab.id}
+                        value={tab.id}
+                        forceMount
+                        className="h-full w-full data-[state=inactive]:hidden"
+                    >
+                        {tab.type === 'terminal' && <TerminalPanel onOpenUrl={(url) => addTab('browser', url)} />}
+                        {tab.type === 'browser' && <BrowserPanel initialUrl={tab.url} />}
+                    </Tabs.Content>
+                ))}
+            </div>
+        </Tabs.Root>
+    );
+}

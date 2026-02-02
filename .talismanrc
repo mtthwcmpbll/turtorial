@@ -4,7 +4,7 @@ fileignoreconfig:
 - filename: backend.log
   checksum: 0181e4eeae0ab15fe8369040796ba9fd135bbe90e7bd1f3e31fff736e0175c12
 - filename: src/main/frontend/package-lock.json
-  checksum: beffda6d96003936a7ea900c29ad61e135ccf83e3f462abe17666cc794208c99
+  checksum: a5cd701af4f4b1226638a70afd6bb943d350c6805875033bec37ab9c330ac723
 - filename: src/main/frontend/src/components/lesson-list/LessonListView.tsx
   checksum: 8ee7751883a36a60d99c450e05425792c8702e218d7c34684ef0db21e57e9657
 - filename: src/main/frontend/src/components/lesson/ContentSection.tsx
