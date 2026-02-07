@@ -2,60 +2,60 @@
 
 This repository includes skills designed for AI agents to assist with development and content creation.
 
-## Create Tutorial Skill
+## Turtorial Skills
 
-The `scripts/create_tutorial.py` script allows you to generate new tutorials or add lessons to existing ones using AI.
+The following skills are available for creating and managing tutorials.
 
-### Usage
+### `turtorial-create-turtorial`
 
+Creates the container scaffold (Dockerfile and directory structure) for a new tutorial.
+
+**Usage:**
 ```bash
-python3 scripts/create_tutorial.py --name <slug> [options]
+.agents/claude/turtorial-create-turtorial --name <slug> --description <description>
 ```
 
-### Arguments
+**Arguments:**
+*   `--name`: Slug/directory name for the tutorial (e.g., `intro-to-python`).
+*   `--description`: Description of the environment and tutorial goal (e.g., "A Python environment with NumPy and Pandas").
 
-*   `--name <slug>`: **Required**. The directory name for the lesson (e.g., `intro-to-python`).
-*   `--topic <topic>`: The topic of the tutorial.
-*   `--url <url>`: URL to source documentation to scrape and use as context.
-*   `--objectives <text>`: Learning objectives for the lesson.
-*   `--level <level>`: Target skill level (default: "Beginner").
-*   `--output-dir <path>`: Output directory for lessons (default: `src/main/resources/lessons`).
-*   `--standalone`: Generate a `Dockerfile` for a standalone tutorial.
-*   `--api-key <key>`: OpenAI API Key (can also be set via `OPENAI_API_KEY` env var).
+### `turtorial-create-lesson`
 
-### Example
+Adds a new lesson (MDX content) to an existing tutorial.
 
-To create a standalone tutorial on "Advanced Java" based on a URL:
-
+**Usage:**
 ```bash
-export OPENAI_API_KEY=sk-...
-python3 scripts/create_tutorial.py \
-  --name advanced-java \
-  --topic "Advanced Java Features" \
-  --url https://docs.oracle.com/en/java/ \
-  --level "Advanced" \
-  --standalone
+.agents/claude/turtorial-create-lesson --tutorial <slug> --topic <topic> --objectives <text> --level <level> [--url <url>]
 ```
 
-This will:
-1.  Scrape the provided URL.
-2.  Generate a lesson structure (YAML metadata and MDX steps).
-3.  Save files to `src/main/resources/lessons/advanced-java`.
-4.  Create `src/main/resources/lessons/advanced-java/Dockerfile`.
+**Arguments:**
+*   `--tutorial`: Slug of the existing tutorial (e.g., `intro-to-python`).
+*   `--topic`: The topic of the new lesson.
+*   `--objectives`: Learning objectives.
+*   `--level`: Target skill level (default: "Beginner").
+*   `--url`: URL to source documentation to scrape and use as context.
 
-### Building Standalone Tutorial
+### `turtorial-update-lesson`
 
-If `--standalone` was used:
+Enhances or modifies an existing lesson file.
 
+**Usage:**
 ```bash
-docker build -f src/main/resources/lessons/advanced-java/Dockerfile -t turtorial-advanced-java .
-docker run -p 8080:8080 turtorial-advanced-java
+.agents/claude/turtorial-update-lesson --file <path> --instruction <text>
 ```
+
+**Arguments:**
+*   `--file`: Path to the lesson file (.mdx or .yml).
+*   `--instruction`: Instruction for the update (e.g., "Fix typos", "Add an example").
 
 ### Dependencies
 
-Ensure dependencies are installed:
+Ensure Python dependencies are installed:
 
 ```bash
-pip install -r scripts/requirements.txt
+pip install -r .agents/skills/requirements.txt
 ```
+
+### Environment
+
+Set the `OPENAI_API_KEY` environment variable to use these skills.
