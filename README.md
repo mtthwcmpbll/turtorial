@@ -13,15 +13,15 @@ Turtorial is an open-source platform that helps you create interactive, terminal
 
 ## 📚 Creating Your First Lesson
 
-Building a lesson is as simple as writing a Markdown file. Lessons live in the `src/main/resources/lessons` directory.
+Building a lesson is as simple as writing a Markdown file.
 
 ### 1. Structure Your Lesson
 
 Each lesson gets its own folder. Inside, you'll need a `lesson.yml` for metadata and your step files.
 
 ```
-src/main/resources/lessons/
-└── my-first-lesson/       # Your lesson folder
+my-lessons/                # Your local lessons folder
+└── my-first-lesson/       # A specific lesson
     ├── lesson.yml         # Lesson details
     ├── 01-intro.mdx       # Step 1
     ├── 02-setup.mdx       # Step 2
@@ -59,11 +59,9 @@ echo "Hello from Turtorial!"
 ```
 ```
 
-### 4. Add Interactivity with Quizzes
+### 4. Add Interactivity
 
 Make your lessons engaging by adding quizzes directly in the frontmatter.
-
-**Multiple Choice:**
 
 ```yaml
 ---
@@ -74,44 +72,64 @@ quizzes:
     options:
       - cd
       - ls
-      - mkdir
     correctAnswer: ls
 ---
 ```
 
-**Free Text Response:**
+## 📦 Packaging & Distributing Your Lesson
 
-```yaml
----
-title: Check Understanding
-quizzes:
-  - question: Type "success" to continue.
-    type: TEXT
-    validationRegex: "^success$"
----
+The recommended way to distribute your lesson is by building a Docker image based on the official Turtorial image. This allows you to bundle your lessons with exactly the tools and environment they need.
+
+### 1. Create a `Dockerfile`
+
+Create a `Dockerfile` in the root of your project:
+
+```dockerfile
+# Start from the base Turtorial image
+FROM ghcr.io/mtthwcmpbll/turtorial:latest
+
+# Switch to root to install system dependencies
+USER root
+
+# Set the active profile to 'production'
+# This ensures lessons are loaded from /app/lessons instead of the classpath
+ENV SPRING_PROFILES_ACTIVE=production
+
+# Install any tools your lesson requires
+# Example: Installing Python and Git
+RUN apt-get update && apt-get install -y \
+    python3 \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy your lessons into the container
+COPY ./my-lessons /app/lessons
+
+# Switch back to the non-root user for security
+USER turtorial
 ```
 
-### 5. Automate Setup & Cleanup
+### 2. Build Your Image
 
-Need to prepare files or clean up after a step? Use `before` and `after` scripts.
+Build your custom Docker image:
 
-```yaml
----
-title: File Manipulation
-before: touch /tmp/secret.txt
-after: rm /tmp/secret.txt
----
+```bash
+docker build -t my-awesome-lesson .
 ```
 
-## 🚀 Running Your Lesson
+### 3. Run Your Lesson
 
-To preview and share your lessons, you'll need to run the Turtorial application.
+Start the container:
 
-For detailed instructions on building and running the platform locally or with Docker, please see our [BUILDING.md](BUILDING.md) guide.
+```bash
+docker run -p 8080:8080 my-awesome-lesson
+```
+
+Open your browser to `http://localhost:8080` to see your lesson in action!
 
 ## 🤝 Contributing
 
-We love contributions! If you're a developer looking to improve the platform itself, check out [BUILDING.md](BUILDING.md) to get started with the codebase.
+We love contributions! If you're a developer looking to improve the platform itself (the Java backend or React frontend), check out [BUILDING.md](BUILDING.md) for technical build instructions.
 
 ## 📄 License
 
