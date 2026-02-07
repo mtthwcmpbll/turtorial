@@ -1,0 +1,76 @@
+---
+title: Introduction
+---
+# Preparing for Spring Boot Migration
+
+Spring Boot migrations are rarely just a version bump. You need to understand your repositories, identify hidden dependencies, align build tooling, and plan release waves so downstream services can upgrade safely. This workshop walks you through a realistic, end-to-end prep flow using the Moderne CLI so you can move into a Spring Boot 4 migration with fewer surprises.
+
+## Workshop Overview
+
+In this workshop, you will:
+
+1.  **Assess**: Run an initial migration and gather code insight data.
+2.  **Plan**: Analyze dependencies and organize upgrade waves.
+3.  **Baseline**: Normalize Maven, Java, and Spring Boot versions.
+4.  **Smoke Test**: Upgrade to Java 17 and run a Spring Boot 4 smoke test.
+5.  **Migrate**: Finish the migration in waves using custom recipes.
+
+## Environment Setup
+
+This tutorial runs in a pre-configured environment with the Moderne CLI (`mod`) and necessary build tools (Maven, Java).
+
+The example repositories have been cloned into your workspace at `/home/turtorial/moderne-migration-practice` (referred to as `$WORKSHOP`).
+
+Let's start by setting up some environment variables to make the commands easier to run.
+
+```bash
+export WORKSHOP=/home/turtorial/moderne-migration-practice
+export WORKSPACE=/home/turtorial/workspaces/migration-practice-workspace
+export PROJECTS=/home/turtorial/projects
+```
+
+Now, let's create our workspace directory and sync the repositories.
+
+```bash
+mkdir -p $WORKSPACE
+cd $WORKSPACE
+
+# Sync the repositories from the workshop configuration
+mod git sync csv $WORKSPACE $WORKSHOP/repos.csv --with-sources
+```
+
+Verify that the repositories are synced:
+
+```bash
+ls -F $WORKSPACE
+```
+
+You should see a directory structure corresponding to the repositories.
+
+## Build LSTs
+
+To run recipes, we need to build Lossless Semantic Trees (LSTs) for the projects.
+
+```bash
+mod build $WORKSPACE
+```
+
+This might take a few minutes as it compiles the projects and generates the LSTs.
+
+## Install Recipes
+
+We'll install the necessary recipes for this workshop.
+
+```bash
+mod config recipes jar install \
+  io.moderne.recipe:rewrite-spring:0.19.0 \
+  org.openrewrite.recipe:rewrite-migrate-java:3.24.0 \
+  org.openrewrite.recipe:rewrite-java-dependencies:1.48.0 \
+  org.openrewrite:rewrite-java:8.69.0 \
+  org.openrewrite:rewrite-maven:8.69.0 \
+  io.moderne.recipe:rewrite-devcenter:1.13.1 \
+  org.openrewrite.recipe:rewrite-spring:6.21.0 \
+  org.openrewrite.recipe:rewrite-testing-frameworks:3.24.0
+```
+
+Now you are ready to start the assessment!

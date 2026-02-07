@@ -1,0 +1,103 @@
+---
+title: Establish Baseline
+---
+# Module 3: Establish a Baseline
+
+Before we can upgrade to Spring Boot 4, we need to normalize our repositories to a consistent baseline: Java 8 and Spring Boot 2.7. This makes the upgrade path predictable and safer.
+
+## Exercise 1: Create a Baseline Recipe
+
+We will create a composite recipe that applies the following:
+*   Maven best practices (`org.openrewrite.maven.BestPractices`).
+*   Migrate to Java 8 (`org.openrewrite.java.migrate.UpgradeToJava8`).
+*   Migrate to Spring Boot 2.7 (`org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7`).
+*   Replace `spring-cloud-starter-zipkin` (deprecated) with `spring-cloud-sleuth-zipkin`.
+
+Create a file named `WorkshopBaseline.yml` in your `$WORKSHOP` directory:
+
+```bash
+cat <<'EOF' > $WORKSHOP/WorkshopBaseline.yml
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.example.ecom.recipe.SpringBootMigrationWorkshopBaseline
+displayName: Spring Boot Migration Workshop Baseline
+description: Upgrade Java 8, Maven, and Spring Boot 2.7.
+recipeList:
+  - org.openrewrite.maven.BestPractices
+  - org.openrewrite.java.migrate.UpgradeToJava8
+  - org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.springframework.cloud
+      oldArtifactId: spring-cloud-starter-zipkin
+      newGroupId: org.springframework.cloud
+      newArtifactId: spring-cloud-sleuth-zipkin
+EOF
+```
+
+Install the recipe locally:
+
+```bash
+mod config recipes yaml install $WORKSHOP/WorkshopBaseline.yml
+```
+
+## Exercise 2: Apply the Baseline Recipe
+
+First, let's build the LSTs for the new wave structure:
+
+```bash
+mod build $WORKSPACE
+```
+
+Now, run the baseline recipe across the entire workspace (all waves):
+
+```bash
+mod run $WORKSPACE --recipe com.example.ecom.recipe.SpringBootMigrationWorkshopBaseline
+```
+
+Apply the changes:
+
+```bash
+mod git apply $WORKSPACE --last-recipe-run
+```
+
+## Exercise 3: Build and Release
+
+Before proceeding, we must ensure everything builds and release the new versions. We will use the provided helper scripts.
+
+Verify the changes with a build:
+
+```bash
+$WORKSHOP/build.sh
+```
+
+If successful, commit the changes:
+
+```bash
+mod git add $WORKSPACE --last-recipe-run
+mod git commit $WORKSPACE -m "Workshop baseline: Maven, Java 8, Spring Boot 2.7" --last-recipe-run
+```
+
+Now, perform a release to update dependencies and bump versions for the next step:
+
+```bash
+$WORKSHOP/release.sh
+```
+
+Finally, rebuild the LSTs so the CLI sees the updated code state:
+
+```bash
+mod build $WORKSPACE
+```
+
+---
+
+**Quiz**
+
+Why do we establish a baseline before upgrading to Spring Boot 4?
+
+1.  To make the migration harder.
+2.  To ensure all repositories are on a known, stable configuration (e.g., Spring Boot 2.7) before attempting major upgrades.
+3.  To confuse the developers.
+4.  To test the CI pipeline.
+
+**Correct Answer**: 2

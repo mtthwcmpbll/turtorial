@@ -1,0 +1,74 @@
+---
+title: Wave Planning
+---
+# Module 2: Wave Planning
+
+In this module, you'll move from assessment to planning. You will group repositories into “waves” based on dependencies and upgrade them in order.
+
+## Exercise 1: Generate Dependency Data
+
+First, we need to install a recipe that analyzes dependencies to create a wave plan.
+
+Clone the `Release-Train-Metro-Plan` repository:
+
+```bash
+mkdir -p $PROJECTS
+cd $PROJECTS
+git clone https://github.com/MBoegers/Release-Train-Metro-Plan.git
+```
+
+Install the recipe artifact locally:
+
+```bash
+mod config recipes jar install dev.mboegie.rewrite:release-train-metro-plan:RELEASE
+```
+
+Now, run the recipe on your workspace:
+
+```bash
+mod run $WORKSPACE --recipe dev.mboegie.rewrite.releasemetro.ReleaseMetroPlan --parallel
+```
+
+This generates several data tables (e.g., `ParentRelationships`, `ProjectCoordinates`) that can be used to visualize the dependency graph.
+
+In a real-world scenario, you would export these tables and use a tool (like a Jupyter notebook) to generate a "metro map" of your upgrade waves. For this workshop, we have pre-calculated the waves for you.
+
+## Exercise 2: Organize Workspace by Wave
+
+Based on the dependency analysis, we have identified the following waves:
+
+*   **Wave 0**: Independent repositories (libraries).
+*   **Wave 1**: Services depending only on Wave 0.
+*   **Wave 2**: Services depending on Wave 1.
+*   **Wave 3**: Services depending on Wave 2.
+
+We will use a special `repos-waves.csv` file that groups the repositories into these waves. This allows us to target specific waves with our recipes.
+
+Sync the repositories using the wave-aware CSV:
+
+```bash
+mod git sync csv $WORKSPACE $WORKSHOP/repos-waves.csv --with-sources
+```
+
+If prompted to replace the existing organization, confirm with `Y`.
+
+Now, verify the new structure:
+
+```bash
+ls -F $WORKSPACE
+```
+
+You should see directories like `Wave0`, `Wave1`, etc. This structure is critical for running wave-based migrations.
+
+---
+
+**Quiz**
+
+Why do we upgrade in waves?
+
+1.  To upgrade everything at once.
+2.  To upgrade downstream services before their dependencies.
+3.  To ensure that dependencies are upgraded and released before dependent services consume them.
+4.  Because it looks cool on a map.
+
+**Correct Answer**: 3

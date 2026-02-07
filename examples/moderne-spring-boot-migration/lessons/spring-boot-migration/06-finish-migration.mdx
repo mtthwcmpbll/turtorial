@@ -1,0 +1,138 @@
+---
+title: Finish Migration
+---
+# Module 5: Finish Migration in Waves
+
+In this module, you will install a custom recipe to handle the QueryDSL issues, build a composite upgrade recipe, and upgrade each wave of repositories to Spring Boot 4.
+
+## Exercise 1: Install the QueryDSL Recipe
+
+We need a custom recipe to rename packages and update dependencies for QueryDSL.
+
+Clone the custom recipe repository:
+
+```bash
+cd $PROJECTS
+git clone https://github.com/modernetraining/rewrite-querydsl.git
+```
+
+Build and install it locally:
+
+```bash
+cd rewrite-querydsl
+mvn clean install
+mod config recipes jar install org.openrewrite.recipe:rewrite-querydsl:0.1.0-SNAPSHOT
+```
+
+## Exercise 2: Create a Composite Upgrade Recipe
+
+Create a composite recipe that combines:
+*   `UpgradeDependencyVersion` (to bump internal dependencies).
+*   `UpgradeSpringBoot_4_0` (Spring Boot 4).
+*   `UpgradeToQueryDsl5` (QueryDSL 5).
+
+Create a file named `CustomUpgradeSpringBoot_4_0.yml` in your `$WORKSHOP` directory:
+
+```bash
+cat <<'EOF' > $WORKSHOP/CustomUpgradeSpringBoot_4_0.yml
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.recipe.querydsl.CustomUpgradeSpringBoot_4_0
+displayName: CustomUpgradeSpringBoot_4_0
+description: Upgrade internal deps, Spring Boot 4.0, and QueryDSL 5.
+recipeList:
+  - org.openrewrite.java.dependencies.UpgradeDependencyVersion:
+      groupId: com.example.ecom
+      artifactId: "*"
+      newVersion: 1.x
+  - io.moderne.java.spring.boot4.UpgradeSpringBoot_4_0
+  - org.openrewrite.recipe.querydsl.UpgradeToQueryDsl5
+EOF
+```
+
+Install the composite recipe locally:
+
+```bash
+mod config recipes yaml install $WORKSHOP/CustomUpgradeSpringBoot_4_0.yml
+```
+
+## Exercise 3: Upgrade Wave 0
+
+Run the custom recipe on Wave 0:
+
+```bash
+mod run $WORKSPACE/Wave0 --recipe org.openrewrite.recipe.querydsl.CustomUpgradeSpringBoot_4_0
+```
+
+Apply the changes:
+
+```bash
+mod git apply $WORKSPACE/Wave0 --last-recipe-run
+```
+
+Build and release Wave 0:
+
+```bash
+$WORKSHOP/build.sh 0
+$WORKSHOP/release.sh 0
+```
+
+## Exercise 4: Upgrade Wave 1
+
+Now repeat for Wave 1:
+
+```bash
+mod run $WORKSPACE/Wave1 --recipe org.openrewrite.recipe.querydsl.CustomUpgradeSpringBoot_4_0
+```
+
+Apply changes:
+
+```bash
+mod git apply $WORKSPACE/Wave1 --last-recipe-run
+```
+
+Build and release Wave 1:
+
+```bash
+$WORKSHOP/build.sh 1
+$WORKSHOP/release.sh 1
+```
+
+You can continue this process for Wave 2 and Wave 3 to complete the migration across all repositories.
+
+## Exercise 5: Refresh DevCenter
+
+After upgrading waves, you can generate a DevCenter dashboard to visualize the progress.
+
+First, rebuild LSTs:
+
+```bash
+mod build $WORKSPACE
+```
+
+Run the `DevCenterStarter` recipe:
+
+```bash
+mod run $WORKSPACE --recipe io.moderne.devcenter.DevCenterStarter
+```
+
+Generate the DevCenter dashboard:
+
+```bash
+mod devcenter $WORKSPACE --last-recipe-run
+```
+
+This will produce an HTML file you can open to see the updated status of your repositories.
+
+---
+
+**Quiz**
+
+Why is it beneficial to upgrade in waves using a composite recipe?
+
+1.  To ensure that internal dependencies are updated in the correct order and custom issues (like QueryDSL) are handled alongside framework upgrades.
+2.  To make the migration take longer.
+3.  To confuse the build system.
+4.  To avoid using the CLI.
+
+**Correct Answer**: 1
