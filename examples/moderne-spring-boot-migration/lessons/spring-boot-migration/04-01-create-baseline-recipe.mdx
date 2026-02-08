@@ -1,0 +1,41 @@
+---
+title: Create Baseline Recipe
+section: Establish Baseline
+order: 14
+---
+# Exercise 1: Create a Baseline Recipe
+
+In this module, we will normalize our repositories to a consistent baseline: Java 8 and Spring Boot 2.7.
+
+We will create a composite recipe that applies the following:
+*   Maven best practices (`org.openrewrite.maven.BestPractices`).
+*   Migrate to Java 8 (`org.openrewrite.java.migrate.UpgradeToJava8`).
+*   Migrate to Spring Boot 2.7 (`org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7`).
+*   Replace `spring-cloud-starter-zipkin` (deprecated) with `spring-cloud-sleuth-zipkin`.
+
+Create a file named `WorkshopBaseline.yml` in your `$WORKSHOP` directory:
+
+```bash
+cat <<'EOF' > $WORKSHOP/WorkshopBaseline.yml
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: com.example.ecom.recipe.SpringBootMigrationWorkshopBaseline
+displayName: Spring Boot Migration Workshop Baseline
+description: Upgrade Java 8, Maven, and Spring Boot 2.7.
+recipeList:
+  - org.openrewrite.maven.BestPractices
+  - org.openrewrite.java.migrate.UpgradeToJava8
+  - org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.springframework.cloud
+      oldArtifactId: spring-cloud-starter-zipkin
+      newGroupId: org.springframework.cloud
+      newArtifactId: spring-cloud-sleuth-zipkin
+EOF
+```
+
+Install the recipe locally:
+
+```bash
+mod config recipes yaml install $WORKSHOP/WorkshopBaseline.yml
+```

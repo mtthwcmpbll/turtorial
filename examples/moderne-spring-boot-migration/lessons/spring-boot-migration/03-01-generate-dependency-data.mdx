@@ -1,0 +1,34 @@
+---
+title: Generate Dependency Data
+section: Wave Planning
+order: 11
+---
+# Exercise 1: Generate Dependency Data
+
+In this module, you'll move from assessment to planning. You will group repositories into “waves” based on dependencies and upgrade them in order.
+
+First, we need to install a recipe that analyzes dependencies to create a wave plan.
+
+Clone the `Release-Train-Metro-Plan` repository:
+
+```bash
+mkdir -p $PROJECTS
+cd $PROJECTS
+git clone https://github.com/MBoegers/Release-Train-Metro-Plan.git
+```
+
+Install the recipe artifact locally:
+
+```bash
+mod config recipes jar install dev.mboegie.rewrite:release-train-metro-plan:RELEASE
+```
+
+Now, run the recipe on your workspace:
+
+```bash
+mod run $WORKSPACE --recipe dev.mboegie.rewrite.releasemetro.ReleaseMetroPlan --parallel
+```
+
+This generates several data tables (e.g., `ParentRelationships`, `ProjectCoordinates`) that can be used to visualize the dependency graph.
+
+In a real-world scenario, you would export these tables and use a tool (like a Jupyter notebook) to generate a "metro map" of your upgrade waves. For this workshop, we have pre-calculated the waves for you.

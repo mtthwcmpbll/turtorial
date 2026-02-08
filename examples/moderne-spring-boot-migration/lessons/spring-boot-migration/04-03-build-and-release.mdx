@@ -1,0 +1,33 @@
+---
+title: Build and Release
+section: Establish Baseline
+order: 16
+---
+# Exercise 3: Build and Release
+
+Before proceeding, we must ensure everything builds and release the new versions. We will use the provided helper scripts.
+
+Verify the changes with a build:
+
+```bash
+$WORKSHOP/build.sh
+```
+
+If successful, commit the changes:
+
+```bash
+mod git add $WORKSPACE --last-recipe-run
+mod git commit $WORKSPACE -m "Workshop baseline: Maven, Java 8, Spring Boot 2.7" --last-recipe-run
+```
+
+Now, perform a release to update dependencies and bump versions for the next step:
+
+```bash
+$WORKSHOP/release.sh
+```
+
+Finally, rebuild the LSTs so the CLI sees the updated code state:
+
+```bash
+mod build $WORKSPACE
+```

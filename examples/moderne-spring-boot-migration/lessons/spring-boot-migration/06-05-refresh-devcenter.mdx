@@ -1,0 +1,28 @@
+---
+title: Refresh DevCenter
+section: Finish Migration
+order: 27
+---
+# Exercise 5: Refresh DevCenter
+
+After upgrading waves, you can generate a DevCenter dashboard to visualize the progress.
+
+First, rebuild LSTs:
+
+```bash
+mod build $WORKSPACE
+```
+
+Run the `DevCenterStarter` recipe:
+
+```bash
+mod run $WORKSPACE --recipe io.moderne.devcenter.DevCenterStarter
+```
+
+Generate the DevCenter dashboard:
+
+```bash
+mod devcenter $WORKSPACE --last-recipe-run
+```
+
+This will produce an HTML file you can open to see the updated status of your repositories.

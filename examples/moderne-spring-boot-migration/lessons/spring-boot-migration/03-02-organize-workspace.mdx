@@ -1,0 +1,31 @@
+---
+title: Organize Workspace
+section: Wave Planning
+order: 12
+---
+# Exercise 2: Organize Workspace by Wave
+
+Based on the dependency analysis, we have identified the following waves:
+
+*   **Wave 0**: Independent repositories (libraries).
+*   **Wave 1**: Services depending only on Wave 0.
+*   **Wave 2**: Services depending on Wave 1.
+*   **Wave 3**: Services depending on Wave 2.
+
+We will use a special `repos-waves.csv` file that groups the repositories into these waves. This allows us to target specific waves with our recipes.
+
+Sync the repositories using the wave-aware CSV:
+
+```bash
+mod git sync csv $WORKSPACE $WORKSHOP/repos-waves.csv --with-sources
+```
+
+If prompted to replace the existing organization, confirm with `Y`.
+
+Now, verify the new structure:
+
+```bash
+ls -F $WORKSPACE
+```
+
+You should see directories like `Wave0`, `Wave1`, etc. This structure is critical for running wave-based migrations.

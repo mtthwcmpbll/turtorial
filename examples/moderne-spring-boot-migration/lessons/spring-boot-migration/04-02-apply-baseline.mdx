@@ -1,0 +1,24 @@
+---
+title: Apply Baseline
+section: Establish Baseline
+order: 15
+---
+# Exercise 2: Apply the Baseline Recipe
+
+First, let's build the LSTs for the new wave structure:
+
+```bash
+mod build $WORKSPACE
+```
+
+Now, run the baseline recipe across the entire workspace (all waves):
+
+```bash
+mod run $WORKSPACE --recipe com.example.ecom.recipe.SpringBootMigrationWorkshopBaseline
+```
+
+Apply the changes:
+
+```bash
+mod git apply $WORKSPACE --last-recipe-run
+```

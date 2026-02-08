@@ -1,0 +1,27 @@
+---
+title: Upgrade Wave 1
+section: Finish Migration
+order: 26
+---
+# Exercise 4: Upgrade Wave 1
+
+Now repeat for Wave 1:
+
+```bash
+mod run $WORKSPACE/Wave1 --recipe org.openrewrite.recipe.querydsl.CustomUpgradeSpringBoot_4_0
+```
+
+Apply changes:
+
+```bash
+mod git apply $WORKSPACE/Wave1 --last-recipe-run
+```
+
+Build and release Wave 1:
+
+```bash
+$WORKSHOP/build.sh 1
+$WORKSHOP/release.sh 1
+```
+
+You can continue this process for Wave 2 and Wave 3 to complete the migration across all repositories.

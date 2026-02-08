@@ -1,0 +1,22 @@
+---
+title: Install Recipes
+section: Introduction
+order: 4
+---
+# Install Recipes
+
+We'll install the necessary recipes for this workshop.
+
+```bash
+mod config recipes jar install \
+  io.moderne.recipe:rewrite-spring:0.19.0 \
+  org.openrewrite.recipe:rewrite-migrate-java:3.24.0 \
+  org.openrewrite.recipe:rewrite-java-dependencies:1.48.0 \
+  org.openrewrite:rewrite-java:8.69.0 \
+  org.openrewrite:rewrite-maven:8.69.0 \
+  io.moderne.recipe:rewrite-devcenter:1.13.1 \
+  org.openrewrite.recipe:rewrite-spring:6.21.0 \
+  org.openrewrite.recipe:rewrite-testing-frameworks:3.24.0
+```
+
+Now you are ready to start the assessment!
