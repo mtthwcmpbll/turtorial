@@ -1,0 +1,1086 @@
+│
+▲  No story files found for the specified pattern: src/**/*.mdx
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/matt/projects/mtthwcmpbll/turtorial/src/main/frontend[39m
+
+[90mstdout[2m | src/components/lesson/TabbedPane.spec.tsx[2m > [22m[2mTabbedPane[2m > [22m[2madds a new terminal when + is clicked and Terminal is selected
+[22m[39mAddTab ID: term-1706763600000, Existing IDs: term-1
+[90mstdout[2m | src/components/lesson/TabbedPane.spec.tsx[2m > [22m[2mTabbedPane[2m > [22m[2madds a new browser when + is clicked and Browser is selected
+[22m[39mAddTab ID: browser-1706763600000, Existing IDs: term-1
+[90mstdout[2m | src/components/lesson/TabbedPane.spec.tsx[2m > [22m[2mTabbedPane[2m > [22m[2mremoves a terminal when X is clicked
+[22m[39mAddTab ID: term-1706763600000, Existing IDs: term-1
+[90mstdout[2m | src/components/lesson/TabbedPane.spec.tsx[2m > [22m[2mTabbedPane[2m > [22m[2mhandles browser:open event
+[22m[39mAddTab ID: browser-1706763600000, Existing IDs: term-1
+[90mstdout[2m | src/components/lesson/TabbedPane.spec.tsx[2m > [22m[2mTabbedPane[2m > [22m[2mhandles terminal:run-command event by creating new tab if none exists
+[22m[39mAddTab ID: term-1706763600000, Existing IDs: 
+[90mstdout[2m | src/components/lesson/TabbedPane.spec.tsx[2m > [22m[2mTabbedPane[2m > [22m[2mprevents duplicate tabs from rapid events (guardrail)
+[22m[39mAddTab ID: term-1706763600000, Existing IDs: 
+ [31m❯[39m [30m[46m components (chromium) [49m[39m src/components/lesson/TabbedPane.spec.tsx [2m([22m[2m8 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 2212[2mms[22m[39m
+     [32m✓[39m renders with one initial terminal[32m 23[2mms[22m[39m
+     [32m✓[39m adds a new terminal when + is clicked and Terminal is selected[32m 10[2mms[22m[39m
+     [32m✓[39m adds a new browser when + is clicked and Browser is selected[32m 8[2mms[22m[39m
+     [32m✓[39m removes a terminal when X is clicked[32m 11[2mms[22m[39m
+[31m     [31m×[31m handles browser:open event[39m[33m 1095[2mms[22m[39m
+     [32m✓[39m handles terminal:run-command event[32m 4[2mms[22m[39m
+[31m     [31m×[31m handles terminal:run-command event by creating new tab if none exists[39m[33m 1053[2mms[22m[39m
+     [32m✓[39m prevents duplicate tabs from rapid events (guardrail)[32m 7[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m [30m[46m components (chromium) [49m[39m src/components/lesson/TabbedPane.spec.tsx[2m > [22mTabbedPane[2m > [22mhandles browser:open event
+[31m[1mTestingLibraryElementError[22m[39m: Found multiple elements with the text: Browser
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+<span
+  class="truncate"
+>
+  Browser
+</span>
+
+Ignored nodes: comments, script, style
+<span>
+  Browser
+</span>
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+<body>
+  
+  
+
+
+  <div>
+    <div
+      class="flex flex-col h-full w-full bg-[#1e1e1e]"
+      data-orientation="horizontal"
+      dir="ltr"
+    >
+      <div
+        class="flex items-center bg-[#252526] pt-1.5 px-2 border-b border-white/10"
+      >
+        <div
+          aria-orientation="horizontal"
+          class="flex flex-1 overflow-x-auto no-scrollbar items-end gap-1"
+          data-orientation="horizontal"
+          role="tablist"
+          style="outline: none;"
+          tabindex="0"
+        >
+          <button
+            aria-controls="radix-_r_b_-content-term-1"
+            aria-selected="false"
+            class="group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between rounded-t-md border-t border-x border-transparent relative -bottom-[1px] text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200 data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e] focus-visible:outline-none z-10"
+            data-orientation="horizontal"
+            data-radix-collection-item=""
+            data-state="inactive"
+            id="radix-_r_b_-trigger-term-1"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            <div
+              class="flex items-center gap-2 overflow-hidden"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-terminal shrink-0"
+                fill="none"
+                height="14"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="14"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 19h8"
+                />
+                <path
+                  d="m4 17 6-6-6-6"
+                />
+              </svg>
+              <span
+                class="truncate"
+              >
+                Terminal
+              </span>
+            </div>
+            <div
+              class="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+              role="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-x"
+                fill="none"
+                height="12"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="12"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6 6 18"
+                />
+                <path
+                  d="m6 6 12 12"
+                />
+              </svg>
+            </div>
+          </button>
+          <button
+            aria-controls="radix-_r_b_-content-browser-1706763600000"
+            aria-selected="true"
+            class="group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between rounded-t-md border-t border-x border-transparent relative -bottom-[1px] text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200 data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e] focus-visible:outline-none z-10"
+            data-orientation="horizontal"
+            data-radix-collection-item=""
+            data-state="active"
+            id="radix-_r_b_-trigger-browser-1706763600000"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            <div
+              class="flex items-center gap-2 overflow-hidden"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-globe shrink-0"
+                fill="none"
+                height="14"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="14"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                />
+                <path
+                  d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                />
+                <path
+                  d="M2 12h20"
+                />
+              </svg>
+              <span
+                class="truncate"
+              >
+                Browser
+              </span>
+            </div>
+            <div
+              class="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+              role="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-x"
+                fill="none"
+                height="12"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="12"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6 6 18"
+                />
+                <path
+                  d="m6 6 12 12"
+                />
+              </svg>
+            </div>
+          </button>
+        </div>
+        <div>
+          <div>
+            <button
+              class="flex items-center justify-center h-full px-3 text-gray-400 hover:text-white hover:bg-[#2a2d2e] border-l border-white/5 transition-colors focus:outline-none"
+              title="New Tab"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-plus"
+                fill="none"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 12h14"
+                />
+                <path
+                  d="M12 5v14"
+                />
+              </svg>
+            </button>
+          </div>
+          <div>
+            <div>
+              <div
+                role="menuitem"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-terminal"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 19h8"
+                  />
+                  <path
+                    d="m4 17 6-6-6-6"
+                  />
+                </svg>
+                <span>
+                  Terminal
+                </span>
+              </div>
+              <div
+                role="menuitem"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-globe"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                  />
+                  <path
+                    d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                  />
+                  <path
+                    d="M2 12h20"
+                  />
+                </svg>
+                <span>
+                  Browser
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex-1 relative min-h-0"
+      >
+        <div
+          aria-labelledby="radix-_r_b_-trigger-term-1"
+          class="h-full w-full data-[state=inactive]:hidden"
+          data-orientation="horizontal"
+          data-state="inactive"
+          id="radix-_r_b_-content-term-1"
+          role="tabpanel"
+          style="animation-duration: 0s;"
+          tabindex="0"
+        >
+          <div
+            data-testid="terminal-panel"
+          >
+            Terminal Content
+          </div>
+        </div>
+        <div
+          aria-labelledby="radix-_r_b_-trigger-browser-1706763600000"
+          class="h-full w-full data-[state=inactive]:hidden"
+          data-orientation="horizontal"
+          data-state="active"
+          id="radix-_r_b_-content-browser-1706763600000"
+          role="tabpanel"
+          style="animation-duration: 0s;"
+          tabindex="0"
+        >
+          <div
+            data-testid="browser-panel"
+          >
+            Browser Content
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<html
+  lang="en"
+>
+  <head>
+    
+    
+    
+    
+    
+
+    
+    
+
+    
+    <meta
+      charset="UTF-8"
+    />
+    
+    
+    <link
+      href="/__vitest__/favicon.svg"
+      rel="icon"
+      type="image/svg+xml"
+    />
+    
+    
+    <meta
+      content="width=device-width, initial-scale=1.0"
+      name="viewport"
+    />
+    
+    
+    <title>
+      Vitest Browser Tester
+    </title>
+    
+    
+    
+    
+    <link
+      crossorigin=""
+      href="/__vitest_browser__/utils-uxqdqUz8.js"
+      rel="modulepreload"
+    />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+  </head>
+  
+  
+  <body>
+    
+  
+
+
+    <div>
+      <div
+        class="flex flex-col h-full w-full bg-[#1e1e1e]"
+        data-orientation="horizontal"
+        dir="ltr"
+      >
+        <div
+          class="flex items-center bg-[#252526] pt-1.5 px-2 border-b border-white/10"
+        >
+          <div
+            aria-orientation="horizontal"
+            class="flex flex-1 overflow-x-auto no-scrollbar items-end gap-1"
+            data-orientation="horizontal"
+            role="tablist"
+            style="outline: none;"
+            tabindex="0"
+          >
+            <button
+              aria-controls="radix-_r_b_-content-term-1"
+              aria-selected="false"
+              class="group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between rounded-t-md border-t border-x border-transparent relative -bottom-[1px] text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200 data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e] focus-visible:outline-none z-10"
+              data-orientation="horizontal"
+              data-radix-collection-item=""
+              data-state="inactive"
+              id="radix-_r_b_-trigger-term-1"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              <div
+                class="flex items-center gap-2 overflow-hidden"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-terminal shrink-0"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 19h8"
+                  />
+                  <path
+                    d="m4 17 6-6-6-6"
+                  />
+                </svg>
+                <span
+                  class="truncate"
+                >
+                  Terminal
+                </span>
+              </div>
+              <div
+                class="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+                role="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-x"
+                  fill="none"
+                  height="12"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6 6 18"
+                  />
+                  <path
+                    d="m6 6 12 12"
+                  />
+                </svg>
+              </div>
+            </button>
+            <button
+              aria-controls="radix-_r_b_-content-browser-1706763600000"
+              aria-selected="true"
+              class="group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between rounded-t-md border-t border-x border-transparent relative -bottom-[1px] text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200 data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e] focus-visible:outline-none z-10"
+              data-orientation="horizontal"
+              data-radix-collection-item=""
+              data-state="active"
+              id="radix-_r_b_-trigger-browser-1706763600000"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              <div
+                class="flex items-center gap-2 overflow-hidden"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-globe shrink-0"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                  />
+                  <path
+                    d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                  />
+                  <path
+                    d="M2 12h20"
+                  />
+                </svg>
+                <span
+                  class="truncate"
+                >
+                  Browser
+                </span>
+              </div>
+              <div
+                class="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+                role="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-x"
+                  fill="none"
+                  height="12"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6 6 18"
+                  />
+                  <path
+                    d="m6 6 12 12"
+                  />
+                </svg>
+              </div>
+            </button>
+          </div>
+          <div>
+            <div>
+              <button
+                class="flex items-center justify-center h-full px-3 text-gray-400 hover:text-white hover:bg-[#2a2d2e] border-l border-white/5 transition-colors focus:outline-none"
+                title="New Tab"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-plus"
+                  fill="none"
+                  height="16"
+         ...
+
+Failure screenshot:
+  - [2msrc/components/lesson/__screenshots__/TabbedPane.spec.tsx/TabbedPane-handles-browser-open-event-1.png[22m
+
+[36m [2m❯[22m src/components/lesson/TabbedPane.spec.tsx:[2m109:10[22m[39m
+    [90m107| [39m
+    [90m108| [39m    [90m// Should add a browser tab - wait for state update[39m
+    [90m109| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m         [31m^[39m
+    [90m110| [39m      [34mexpect[39m(screen[33m.[39m[34mgetAllByRole[39m([32m'tab'[39m))[33m.[39m[34mtoHaveLength[39m([34m2[39m)[33m;[39m
+    [90m111| [39m      [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'Browser'[39m))[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m [30m[46m components (chromium) [49m[39m src/components/lesson/TabbedPane.spec.tsx[2m > [22mTabbedPane[2m > [22mhandles terminal:run-command event by creating new tab if none exists
+[31m[1mTestingLibraryElementError[22m[39m: Found multiple elements with the text: Terminal
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+<span
+  class="truncate"
+>
+  Terminal
+</span>
+
+Ignored nodes: comments, script, style
+<span>
+  Terminal
+</span>
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+<body>
+  
+  
+
+
+  <div>
+    <div
+      class="flex flex-col h-full w-full bg-[#1e1e1e]"
+      data-orientation="horizontal"
+      dir="ltr"
+    >
+      <div
+        class="flex items-center bg-[#252526] pt-1.5 px-2 border-b border-white/10"
+      >
+        <div
+          aria-orientation="horizontal"
+          class="flex flex-1 overflow-x-auto no-scrollbar items-end gap-1"
+          data-orientation="horizontal"
+          role="tablist"
+          style="outline: none;"
+          tabindex="0"
+        >
+          <button
+            aria-controls="radix-_r_g_-content-term-1706763600000"
+            aria-selected="true"
+            class="group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between rounded-t-md border-t border-x border-transparent relative -bottom-[1px] text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200 data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e] focus-visible:outline-none z-10"
+            data-orientation="horizontal"
+            data-radix-collection-item=""
+            data-state="active"
+            id="radix-_r_g_-trigger-term-1706763600000"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            <div
+              class="flex items-center gap-2 overflow-hidden"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-terminal shrink-0"
+                fill="none"
+                height="14"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="14"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 19h8"
+                />
+                <path
+                  d="m4 17 6-6-6-6"
+                />
+              </svg>
+              <span
+                class="truncate"
+              >
+                Terminal
+              </span>
+            </div>
+            <div
+              class="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+              role="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-x"
+                fill="none"
+                height="12"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="12"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6 6 18"
+                />
+                <path
+                  d="m6 6 12 12"
+                />
+              </svg>
+            </div>
+          </button>
+        </div>
+        <div>
+          <div>
+            <button
+              class="flex items-center justify-center h-full px-3 text-gray-400 hover:text-white hover:bg-[#2a2d2e] border-l border-white/5 transition-colors focus:outline-none"
+              title="New Tab"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-plus"
+                fill="none"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 12h14"
+                />
+                <path
+                  d="M12 5v14"
+                />
+              </svg>
+            </button>
+          </div>
+          <div>
+            <div>
+              <div
+                role="menuitem"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-terminal"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 19h8"
+                  />
+                  <path
+                    d="m4 17 6-6-6-6"
+                  />
+                </svg>
+                <span>
+                  Terminal
+                </span>
+              </div>
+              <div
+                role="menuitem"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-globe"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                  />
+                  <path
+                    d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                  />
+                  <path
+                    d="M2 12h20"
+                  />
+                </svg>
+                <span>
+                  Browser
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex-1 relative min-h-0"
+      >
+        <div
+          aria-labelledby="radix-_r_g_-trigger-term-1706763600000"
+          class="h-full w-full data-[state=inactive]:hidden"
+          data-orientation="horizontal"
+          data-state="active"
+          id="radix-_r_g_-content-term-1706763600000"
+          role="tabpanel"
+          style="animation-duration: 0s;"
+          tabindex="0"
+        >
+          <div
+            data-testid="terminal-panel"
+          >
+            Terminal Content
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<html
+  lang="en"
+>
+  <head>
+    
+    
+    
+    
+    
+
+    
+    
+
+    
+    <meta
+      charset="UTF-8"
+    />
+    
+    
+    <link
+      href="/__vitest__/favicon.svg"
+      rel="icon"
+      type="image/svg+xml"
+    />
+    
+    
+    <meta
+      content="width=device-width, initial-scale=1.0"
+      name="viewport"
+    />
+    
+    
+    <title>
+      Vitest Browser Tester
+    </title>
+    
+    
+    
+    
+    <link
+      crossorigin=""
+      href="/__vitest_browser__/utils-uxqdqUz8.js"
+      rel="modulepreload"
+    />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+  </head>
+  
+  
+  <body>
+    
+  
+
+
+    <div>
+      <div
+        class="flex flex-col h-full w-full bg-[#1e1e1e]"
+        data-orientation="horizontal"
+        dir="ltr"
+      >
+        <div
+          class="flex items-center bg-[#252526] pt-1.5 px-2 border-b border-white/10"
+        >
+          <div
+            aria-orientation="horizontal"
+            class="flex flex-1 overflow-x-auto no-scrollbar items-end gap-1"
+            data-orientation="horizontal"
+            role="tablist"
+            style="outline: none;"
+            tabindex="0"
+          >
+            <button
+              aria-controls="radix-_r_g_-content-term-1706763600000"
+              aria-selected="true"
+              class="group flex items-center gap-2 px-4 py-2 text-sm select-none cursor-pointer min-w-[120px] justify-between rounded-t-md border-t border-x border-transparent relative -bottom-[1px] text-gray-400 bg-white/5 hover:bg-[#2a2d2e] hover:text-gray-200 data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white data-[state=active]:border-white/10 data-[state=active]:border-b-[#1e1e1e] focus-visible:outline-none z-10"
+              data-orientation="horizontal"
+              data-radix-collection-item=""
+              data-state="active"
+              id="radix-_r_g_-trigger-term-1706763600000"
+              role="tab"
+              tabindex="-1"
+              type="button"
+            >
+              <div
+                class="flex items-center gap-2 overflow-hidden"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-terminal shrink-0"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 19h8"
+                  />
+                  <path
+                    d="m4 17 6-6-6-6"
+                  />
+                </svg>
+                <span
+                  class="truncate"
+                >
+                  Terminal
+                </span>
+              </div>
+              <div
+                class="ml-1 rounded-sm p-0.5 opacity-0 group-hover:opacity-100 hover:bg-white/20 text-gray-500 hover:text-white transition-all"
+                role="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-x"
+                  fill="none"
+                  height="12"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6 6 18"
+                  />
+                  <path
+                    d="m6 6 12 12"
+                  />
+                </svg>
+              </div>
+            </button>
+          </div>
+          <div>
+            <div>
+              <button
+                class="flex items-center justify-center h-full px-3 text-gray-400 hover:text-white hover:bg-[#2a2d2e] border-l border-white/5 transition-colors focus:outline-none"
+                title="New Tab"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-plus"
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 12h14"
+                  />
+                  <path
+                    d="M12 5v14"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div>
+              <div>
+                <div
+                  role="menuitem"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-terminal"
+                    fill="none"
+                    height="14"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="14"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 19h8"
+                    />
+                    <path
+                      d="m4 17 6-6-6-6"
+                    />
+                  </svg>
+                  <span>
+                    Terminal
+                  </span>
+                </div>
+                <div
+                  role="menuitem"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-globe"
+                    fill="none"
+                    height="14"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="14"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                    />
+                    <path
+                      d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"
+                    />
+                    <path
+                      d="M2 12h20"
+                    />
+                  </svg>
+                  <span>
+                    Browser
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex-1 relative min-h-0"
+        >
+          <div
+            aria-labelledby="radix-_r_g_-trigger-term-1706763600000"
+            class="h-full w-full data-[state=inactive]:hidden"
+            data-orientation="horizontal"
+   ...
+
+Failure screenshot:
+  - [2msrc/components/lesson/__screenshots__/TabbedPane.spec.tsx/TabbedPane-handles-terminal-run-command-event-by-creating-new-tab-if-none-exists-1.png[22m
+
+[36m [2m❯[22m src/components/lesson/TabbedPane.spec.tsx:[2m141:10[22m[39m
+    [90m139| [39m
+    [90m140| [39m    [90m// Should create a new terminal tab[39m
+    [90m141| [39m    [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m         [31m^[39m
+    [90m142| [39m      [34mexpect[39m(screen[33m.[39m[34mgetAllByRole[39m([32m'tab'[39m))[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m
+    [90m143| [39m      [34mexpect[39m(screen[33m.[39m[34mgetByText[39m([32m'Terminal'[39m))[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 22:38:22
+[2m   Duration [22m 3.06s[2m (transform 0ms, setup 0ms, import 166ms, tests 2.21s, environment 0ms)[22m
+
