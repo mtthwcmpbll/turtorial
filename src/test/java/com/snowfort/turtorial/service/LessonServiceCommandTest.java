@@ -1,6 +1,7 @@
 package com.snowfort.turtorial.service;
 
 import com.snowfort.turtorial.model.Lesson;
+import com.snowfort.turtorial.repository.ResourceLessonRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,8 +21,6 @@ public class LessonServiceCommandTest {
         Path prepareFile = tempDir.resolve("prepare.txt");
         Path cleanupFile = tempDir.resolve("cleanup.txt");
 
-        // Create a step with before and after commands
-        // Commands create files in the tempDir
         String beforeCmd = "touch " + prepareFile.toAbsolutePath();
         String afterCmd = "touch " + cleanupFile.toAbsolutePath();
 
@@ -29,12 +28,14 @@ public class LessonServiceCommandTest {
         Files.writeString(step1,
                 String.format("---\ntitle: Cmd Step\nbefore: %s\nafter: %s\n---\n# Content", beforeCmd, afterCmd));
 
-        // Initialize service
-        LessonService service = new LessonService(
+        ResourceLessonRepository repo = new ResourceLessonRepository(
+                new LessonParser(true),
                 tempDir.resolve("lessons").toUri().toString(),
                 true,
                 true);
-        service.init();
+        repo.init();
+
+        LessonService service = new LessonService(repo, new ShellCommandExecutor());
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -42,13 +43,11 @@ public class LessonServiceCommandTest {
         String lessonId = lesson.getId();
         String stepId = lesson.getSteps().get(0).getId();
 
-        // Verify prepareStep
         Assertions.assertFalse(Files.exists(prepareFile), "Prepare file should not exist yet");
         boolean prepareResult = service.runBeforeStep(lessonId, stepId);
         Assertions.assertTrue(prepareResult, "Prepare step should succeed");
         Assertions.assertTrue(Files.exists(prepareFile), "Prepare file should exist after prepareStep");
 
-        // Verify cleanupStep
         Assertions.assertFalse(Files.exists(cleanupFile), "Cleanup file should not exist yet");
         boolean cleanupResult = service.runAfterStep(lessonId, stepId);
         Assertions.assertTrue(cleanupResult, "Cleanup step should succeed");
