@@ -39,8 +39,7 @@ export default defineConfig({
       'clsx',
       'tailwind-merge',
       'react-dom'
-    ],
-    force: true
+    ]
   },
   test: {
     projects: [{
