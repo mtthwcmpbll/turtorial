@@ -35,6 +35,8 @@ export default defineConfig({
       '@testing-library/react',
       '@testing-library/dom',
       '@testing-library/user-event',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-dropdown-menu',
       'lucide-react',
       'clsx',
       'tailwind-merge',
