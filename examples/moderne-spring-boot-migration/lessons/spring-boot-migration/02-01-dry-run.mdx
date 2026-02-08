@@ -1,0 +1,18 @@
+---
+title: Full Migration Dry Run
+section: Assessment
+order: 5
+---
+# Exercise 1: Run the Full Migration Recipe (Dry Run)
+
+In this module, you will run the Spring Boot 4 migration recipe to find the biggest risks and blockers. The idea is to see what breaks before investing time in fixes.
+
+First, let's run a "dry run" of the full Spring Boot 4 migration recipe. This will not modify the code but will identify what changes would be made and what errors might occur.
+
+```bash
+mod run $WORKSPACE --recipe io.moderne.java.spring.boot4.UpgradeSpringBoot_4_0 --dry-run
+```
+
+Review the output. You might see warnings or errors related to missing types or compilation failures. This is expected!
+
+Specifically, look for errors related to `QueryDSL` (generated code issues) or missing dependencies.

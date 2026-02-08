@@ -1,0 +1,20 @@
+---
+title: Spring Boot 4 Smoke Test
+section: Smoke Test
+order: 19
+---
+# Exercise 2: Run a Spring Boot 4 Smoke Test
+
+Now that we are on Java 17, let's see how far the Spring Boot 4 upgrade gets. This is a "smoke test" to identify remaining blockers.
+
+Run the upgrade recipe:
+
+```bash
+mod run $WORKSPACE --recipe io.moderne.java.spring.boot4.UpgradeSpringBoot_4_0
+```
+
+Apply the changes temporarily:
+
+```bash
+mod git apply $WORKSPACE --last-recipe-run
+```

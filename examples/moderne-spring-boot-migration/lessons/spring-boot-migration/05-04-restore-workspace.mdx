@@ -1,0 +1,24 @@
+---
+title: Restore Workspace
+section: Smoke Test
+order: 21
+---
+# Exercise 4: Restore Workspace
+
+Since the build is broken, let's revert the changes.
+
+```bash
+mod exec $WORKSPACE git restore .
+```
+
+Verify the workspace is clean:
+
+```bash
+mod git status $WORKSPACE
+```
+
+Rebuild LSTs to ensure we are back to the Java 17 baseline:
+
+```bash
+mod build $WORKSPACE
+```

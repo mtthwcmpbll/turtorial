@@ -1,0 +1,36 @@
+---
+title: Create Composite Recipe
+section: Finish Migration
+order: 24
+---
+# Exercise 2: Create a Composite Upgrade Recipe
+
+Create a composite recipe that combines:
+*   `UpgradeDependencyVersion` (to bump internal dependencies).
+*   `UpgradeSpringBoot_4_0` (Spring Boot 4).
+*   `UpgradeToQueryDsl5` (QueryDSL 5).
+
+Create a file named `CustomUpgradeSpringBoot_4_0.yml` in your `$WORKSHOP` directory:
+
+```bash
+cat <<'EOF' > $WORKSHOP/CustomUpgradeSpringBoot_4_0.yml
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.recipe.querydsl.CustomUpgradeSpringBoot_4_0
+displayName: CustomUpgradeSpringBoot_4_0
+description: Upgrade internal deps, Spring Boot 4.0, and QueryDSL 5.
+recipeList:
+  - org.openrewrite.java.dependencies.UpgradeDependencyVersion:
+      groupId: com.example.ecom
+      artifactId: "*"
+      newVersion: 1.x
+  - io.moderne.java.spring.boot4.UpgradeSpringBoot_4_0
+  - org.openrewrite.recipe.querydsl.UpgradeToQueryDsl5
+EOF
+```
+
+Install the composite recipe locally:
+
+```bash
+mod config recipes yaml install $WORKSHOP/CustomUpgradeSpringBoot_4_0.yml
+```
