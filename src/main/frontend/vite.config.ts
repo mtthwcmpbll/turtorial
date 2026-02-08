@@ -67,6 +67,7 @@ export default defineConfig({
       }
     },
     {
+      extends: true,
       test: {
         name: 'components',
         browser: {

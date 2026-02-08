@@ -34,19 +34,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: src/main/frontend
-      - name: Run Component Tests
-        run: npx vitest --project=components --run --reporter=verbose
-        working-directory: src/main/frontend
-        env:
-          DEBUG: "vite:deps"
-      - name: Run Storybook Tests
-        run: npx vitest --project=storybook --run
-        working-directory: src/main/frontend
-      - name: Debug - List Vite cache
-        if: failure()
-        run: |
-          echo "=== Vite optimization cache ==="
-          find node_modules/.vite -type f -name '*.js' 2>/dev/null | head -30 || echo "No .vite cache found"
-          echo "=== Looking for @testing-library_react ==="
-          find node_modules/.vite -name '*testing-library*' 2>/dev/null || echo "Not found"
+      - name: Run Frontend Tests
+        run: npm run test
         working-directory: src/main/frontend
