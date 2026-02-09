@@ -22,16 +22,6 @@ jobs:
         id: slug
         run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
 
-      - name: Set up JDK 25
-        uses: actions/setup-java@v4
-        with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build with Maven
-        run: mvn -B -Pproduction clean package
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -49,6 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: {context}/Dockerfile.native
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

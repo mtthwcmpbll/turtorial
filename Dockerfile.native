@@ -1,3 +1,20 @@
+# Stage 1: Build the native image inside a Linux GraalVM container
+FROM ghcr.io/graalvm/native-image-community:25 AS builder
+
+WORKDIR /build
+
+# Copy Maven wrapper and pom.xml first for better layer caching
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY src src
+
+# Build the native image with frontend assets (prod profile builds frontend via frontend-maven-plugin)
+RUN ./mvnw clean package -Pnative,prod -DskipTests
+
+# Stage 2: Runtime base image with tools for the tutorial environment
 FROM ubuntu:24.04 AS base
 
 # Set install locations
@@ -22,21 +39,6 @@ RUN apt-get update && apt-get install -y \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Temurin JDK 25
-RUN mkdir -p $JAVA_HOME \
-    && curl -L "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jdk_aarch64_linux_hotspot_25.0.1_8.tar.gz" | tar -xz -C $JAVA_HOME --strip-components=1
-
-# Install Maven
-RUN mkdir -p $MAVEN_HOME \
-    && curl -L "https://dlcdn.apache.org/maven/maven-3/3.9.12/binaries/apache-maven-3.9.12-bin.tar.gz" | tar -xz -C $MAVEN_HOME --strip-components=1
-
-# Install Gradle
-RUN mkdir -p $GRADLE_HOME \
-    && curl -L -o /tmp/gradle.zip "https://services.gradle.org/distributions/gradle-9.2.1-bin.zip" \
-    && unzip /tmp/gradle.zip -d /opt \
-    && mv /opt/gradle-9.2.1/* $GRADLE_HOME/ \
-    && rm -rf /opt/gradle-9.2.1 /tmp/gradle.zip
-
 FROM base AS platform
 
 # Create the turtorial user
@@ -48,10 +50,8 @@ RUN mkdir -p /home/turtorial/.ssh \
 # Create app directory
 WORKDIR /app
 
-# Copy the built application
-# Assumes `mvn clean package` has been run locally
-ARG JAR_FILE=target/turtorial-*-SNAPSHOT.jar
-COPY ${JAR_FILE} /app/turtorial.jar
+# Copy the native binary from the builder stage (now a Linux binary)
+COPY --from=builder /build/target/turtorial /app/turtorial
 
 # Change ownership of the app directory
 RUN chown -R turtorial:turtorial /app
@@ -69,4 +69,4 @@ EXPOSE 8080
 RUN mkdir -p /app/lessons
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "/app/turtorial.jar"]
+ENTRYPOINT ["/app/turtorial"]
