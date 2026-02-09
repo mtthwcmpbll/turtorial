@@ -1,0 +1,19 @@
+---
+title: Find javax.* Usage
+section: Assessment
+order: 8
+---
+# Exercise 4: Find `javax.*` Usage
+
+Spring Boot 3+ (and thus 4) moves from `javax.*` to `jakarta.*`. High usage of `javax.*` means more work.
+
+```bash
+mod run $WORKSPACE --recipe org.openrewrite.java.search.FindTypes --dry-run \
+  --recipe-option fullyQualifiedTypeName=javax..*
+```
+
+Check the results:
+
+```bash
+mod study $WORKSPACE --last-recipe-run --data-table org.openrewrite.java.search.TypeUses
+```

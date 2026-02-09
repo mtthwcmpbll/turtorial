@@ -133,7 +133,7 @@ jobs:
         run: mvn -B versions:set -DnewVersion=${{ needs.prepare-release.outputs.release-version }} -DgenerateBackupPoms=false
 
       - name: Build Native Binary
-        run: ./mvnw clean package -Pnative,prod -DskipTests
+        run: ./mvnw clean package -Pprod -DskipTests
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -149,8 +149,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile.native
-          build-args: BINARY=prebuilt
+          file: ./Dockerfile
+          build-args: JAR_SOURCE=build
           platforms: ${{ matrix.platform }}
           push: true
           tags: |

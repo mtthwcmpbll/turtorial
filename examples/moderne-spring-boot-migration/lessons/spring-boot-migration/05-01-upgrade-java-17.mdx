@@ -1,0 +1,36 @@
+---
+title: Upgrade to Java 17
+section: Smoke Test
+order: 18
+---
+# Exercise 1: Upgrade to Java 17
+
+In this module, you will raise the Java baseline to 17 and run a controlled Spring Boot 4 upgrade to identify any remaining blockers.
+
+Spring Boot 3+ (and 4) requires Java 17 or higher. So, let's upgrade all repositories to Java 17 first.
+
+Run the `UpgradeToJava17` recipe:
+
+```bash
+mod run $WORKSPACE --recipe org.openrewrite.java.migrate.UpgradeToJava17
+```
+
+Apply the changes:
+
+```bash
+mod git apply $WORKSPACE --last-recipe-run
+```
+
+Now, build and commit the changes:
+
+```bash
+$WORKSHOP/build.sh
+mod git add $WORKSPACE --last-recipe-run
+mod git commit $WORKSPACE -m "Upgrade to Java 17" --last-recipe-run
+```
+
+And rebuild the LSTs:
+
+```bash
+mod build $WORKSPACE
+```

@@ -1,0 +1,20 @@
+---
+title: Identify Java Version
+section: Assessment
+order: 6
+---
+# Exercise 2: Identify Java Version Usage
+
+Let's see what Java versions are currently in use across the repositories.
+
+```bash
+mod run $WORKSPACE --recipe org.openrewrite.java.migrate.search.PlanJavaMigration --dry-run
+```
+
+To see the data table produced by this recipe:
+
+```bash
+mod study $WORKSPACE --last-recipe-run --data-table org.openrewrite.java.migrate.table.JavaVersionMigrationPlan
+```
+
+You should see that most projects are on Java 8.

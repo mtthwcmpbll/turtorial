@@ -1,3 +1,23 @@
+# Build arg to select JAR source: "build" (compile from source) or "prebuilt" (use pre-built JAR)
+ARG JAR_SOURCE=build
+
+# Builder stage — compiles JAR from source with frontend (default)
+FROM eclipse-temurin:25-jdk AS build
+WORKDIR /build
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline -B
+COPY src src
+RUN ./mvnw clean package -Pprod -DskipTests \
+    && cp target/turtorial-*.jar /turtorial.jar
+
+# Prebuilt stage — copies JAR from build context (CI or local pre-built)
+FROM scratch AS prebuilt
+COPY target/turtorial-*.jar /turtorial.jar
+
+# Select JAR source based on ARG (BuildKit skips unused stages)
+FROM ${JAR_SOURCE} AS jar
+
 FROM ubuntu:24.04 AS base
 
 # Set install locations
@@ -22,9 +42,15 @@ RUN apt-get update && apt-get install -y \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Temurin JDK 25
-RUN mkdir -p $JAVA_HOME \
-    && curl -L "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jdk_aarch64_linux_hotspot_25.0.1_8.tar.gz" | tar -xz -C $JAVA_HOME --strip-components=1
+# Install Temurin JDK 25 (detect architecture automatically)
+RUN ARCH=$(uname -m) \
+    && case "$ARCH" in \
+       x86_64) TEMURIN_ARCH="x64" ;; \
+       aarch64) TEMURIN_ARCH="aarch64" ;; \
+       *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac \
+    && mkdir -p $JAVA_HOME \
+    && curl -L "https://api.adoptium.net/v3/binary/latest/25/ga/linux/${TEMURIN_ARCH}/jdk/hotspot/normal/eclipse?project=jdk" | tar -xz -C $JAVA_HOME --strip-components=1
 
 # Install Maven
 RUN mkdir -p $MAVEN_HOME \
@@ -48,10 +74,8 @@ RUN mkdir -p /home/turtorial/.ssh \
 # Create app directory
 WORKDIR /app
 
-# Copy the built application
-# Assumes `mvn clean package` has been run locally
-ARG JAR_FILE=target/turtorial-*-SNAPSHOT.jar
-COPY ${JAR_FILE} /app/turtorial.jar
+# Copy the JAR from the selected source
+COPY --from=jar /turtorial.jar /app/turtorial.jar
 
 # Change ownership of the app directory
 RUN chown -R turtorial:turtorial /app

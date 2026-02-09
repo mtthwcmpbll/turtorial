@@ -1,0 +1,36 @@
+---
+title: Environment Setup
+section: Introduction
+order: 2
+---
+# Environment Setup
+
+This tutorial runs in a pre-configured environment with the Moderne CLI (`mod`) and necessary build tools (Maven, Java).
+
+The example repositories have been cloned into your workspace at `/home/turtorial/moderne-migration-practice` (referred to as `$WORKSHOP`).
+
+Let's start by setting up some environment variables to make the commands easier to run.
+
+```bash
+export WORKSHOP=/home/turtorial/moderne-migration-practice
+export WORKSPACE=/home/turtorial/workspaces/migration-practice-workspace
+export PROJECTS=/home/turtorial/projects
+```
+
+Now, let's create our workspace directory and sync the repositories.
+
+```bash
+mkdir -p $WORKSPACE
+cd $WORKSPACE
+
+# Sync the repositories from the workshop configuration
+mod git sync csv $WORKSPACE $WORKSHOP/repos.csv --with-sources
+```
+
+Verify that the repositories are synced:
+
+```bash
+ls -F $WORKSPACE
+```
+
+You should see a directory structure corresponding to the repositories.

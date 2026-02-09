@@ -1,0 +1,13 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": "resources/com/pty4j/native/.*"},
+      {"pattern": "com/sun/jna/.*"},
+      {"pattern": "lessons/.*"},
+      {"pattern": "schemas/.*"},
+      {"pattern": "static/.*"},
+      {"pattern": ".*\\.yml"},
+      {"pattern": ".*\\.yaml"}
+    ]
+  }
+}
