@@ -1,9 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
+import { WebLinksAddon } from '@xterm/addon-web-links';
 import '@xterm/xterm/css/xterm.css';
 
-export default function TerminalPanel() {
+interface TerminalPanelProps {
+    onOpenUrl?: (url: string) => void;
+}
+
+export default function TerminalPanel({ onOpenUrl }: TerminalPanelProps) {
     const terminalRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
@@ -21,17 +26,18 @@ export default function TerminalPanel() {
             fontFamily: '"Cascadia Code", "Fira Code", monospace',
         });
 
-        // Handle custom key events (e.g. Tab for completion)
-        term.attachCustomKeyEventHandler((event) => {
-            if (event.code === 'Tab') {
-                event.preventDefault(); // Prevent browser focus switch
-                return true; // Allow xterm to process the key
-            }
-            return true;
-        });
-
         const fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
+
+        // Handle clickable links
+        term.loadAddon(new WebLinksAddon((event, uri) => {
+            event.preventDefault();
+            if (onOpenUrl) {
+                onOpenUrl(uri);
+            } else {
+                window.open(uri, '_blank');
+            }
+        }));
 
         term.open(terminalRef.current);
         fitAddon.fit();
@@ -72,7 +78,6 @@ export default function TerminalPanel() {
             };
 
             ws.onmessage = (event) => {
-                console.log("WS Message received (length):", event.data.length);
                 term.write(event.data);
             };
 

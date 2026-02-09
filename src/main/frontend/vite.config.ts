@@ -14,7 +14,7 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: '127.0.0.1',
+    host: true, // Listen on all addresses (0.0.0.0)
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8080',
@@ -29,15 +29,30 @@ export default defineConfig({
       }
     }
   },
+  optimizeDeps: {
+    include: [
+      'react/jsx-dev-runtime',
+      '@testing-library/react',
+      '@testing-library/dom',
+      '@testing-library/user-event',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-dropdown-menu',
+      'lucide-react',
+      'clsx',
+      'tailwind-merge',
+      'react-dom'
+    ]
+  },
   test: {
     projects: [{
       extends: true,
       plugins: [
-      // The plugin will run tests for the stories defined in your Storybook config
-      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-      storybookTest({
-        configDir: path.join(dirname, '.storybook')
-      })],
+        // The plugin will run tests for the stories defined in your Storybook config
+        // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+        storybookTest({
+          configDir: path.join(dirname, '.storybook')
+        })
+      ],
       test: {
         name: 'storybook',
         browser: {
@@ -52,6 +67,7 @@ export default defineConfig({
       }
     },
     {
+      extends: true,
       test: {
         name: 'components',
         browser: {

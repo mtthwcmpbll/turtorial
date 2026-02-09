@@ -1,7 +1,7 @@
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import LessonPageHeader from './LessonPageHeader';
 import ContentPanel from './ContentPanel';
-import TerminalPanel from './TerminalPanel';
+import TabbedPane from './TabbedPane';
 import type { Lesson } from '../../types';
 
 interface LessonLayoutProps {
@@ -12,7 +12,6 @@ interface LessonLayoutProps {
     onPrev: () => void;
     onNext: () => void;
     onSelectStep: (index: number) => void;
-    onRunCommand: (cmd: string) => void;
 }
 
 export default function LessonLayout({
@@ -23,7 +22,7 @@ export default function LessonLayout({
     onPrev,
     onNext,
     onSelectStep,
-    onRunCommand
+
 }: LessonLayoutProps) {
     return (
         <div className="flex flex-col h-screen w-screen bg-background text-foreground overflow-hidden font-sans">
@@ -39,7 +38,6 @@ export default function LessonLayout({
                             onPrev={onPrev}
                             onNext={onNext}
                             onSelectStep={onSelectStep}
-                            onRunCommand={onRunCommand}
                         />
                     </Panel>
 
@@ -49,7 +47,7 @@ export default function LessonLayout({
 
                     <Panel className="flex flex-col min-w-[300px] border-l border-border bg-[#1e1e1e]">
                         <div className="flex-1 min-h-0">
-                            <TerminalPanel />
+                            <TabbedPane />
                         </div>
                     </Panel>
                 </PanelGroup>

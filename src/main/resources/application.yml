@@ -8,3 +8,6 @@ turtorial:
     directory: classpath:/lessons
     environmentScripts:
       enabled: false
+    frontmatter:
+      validation:
+        fail-on-error: true

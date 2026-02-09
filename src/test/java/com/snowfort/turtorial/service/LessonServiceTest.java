@@ -1,6 +1,10 @@
 package com.snowfort.turtorial.service;
 
 import com.snowfort.turtorial.model.Lesson;
+import com.snowfort.turtorial.model.QuizQuestion;
+import com.snowfort.turtorial.model.QuizType;
+import com.snowfort.turtorial.model.Step;
+import com.snowfort.turtorial.repository.ResourceLessonRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,33 +15,37 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
-import static org.mockito.Mockito.*;
-
 public class LessonServiceTest {
 
-    private Environment mockEnv;
+    private LessonParser lessonParser;
 
     @BeforeEach
     public void setup() {
-        mockEnv = mock(Environment.class);
-        // Default behavior: not production
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
+        lessonParser = new LessonParser(true);
+        lessonParser.init();
+    }
+
+    private LessonService createService(Path tempDir, boolean devMode, boolean failOnError) {
+        LessonParser parser = new LessonParser(failOnError);
+        parser.init();
+        ResourceLessonRepository repo = new ResourceLessonRepository(
+                parser, // Create fresh parser with config
+                tempDir.resolve("lessons").toUri().toString(),
+                devMode,
+                failOnError);
+        repo.init();
+        return new LessonService(repo, new ShellCommandExecutor(), false);
     }
 
     @Test
     public void testLoadLessonsFromDirectory(@TempDir Path tempDir) throws IOException {
-        // Create a mock lesson structure
         Path lessonDir = tempDir.resolve("lessons/lesson-1");
         Files.createDirectories(lessonDir);
 
         Path step1 = lessonDir.resolve("step1.md");
         Files.writeString(step1, "---\ntitle: Test Step\n---\n# Content");
 
-        // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -50,7 +58,6 @@ public class LessonServiceTest {
 
     @Test
     public void testLoadLessonsWithMetadata(@TempDir Path tempDir) throws IOException {
-        // Create a mock lesson structure
         Path lessonDir = tempDir.resolve("lessons/lesson-meta");
         Files.createDirectories(lessonDir);
 
@@ -60,9 +67,7 @@ public class LessonServiceTest {
         Path meta = lessonDir.resolve("lesson.yml");
         Files.writeString(meta, "title: Custom Title\ndescription: Custom Description");
 
-        // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -79,17 +84,13 @@ public class LessonServiceTest {
         Path lessonDir = tempDir.resolve("lessons/lesson-ordering");
         Files.createDirectories(lessonDir);
 
-        // Create 01.md with order 2
         Path step1 = lessonDir.resolve("01.md");
         Files.writeString(step1, "---\ntitle: Step 1\norder: 2\n---\n# Content 1");
 
-        // Create 02.md with order 1
         Path step2 = lessonDir.resolve("02.md");
         Files.writeString(step2, "---\ntitle: Step 2\norder: 1\n---\n# Content 2");
 
-        // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, true, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -98,11 +99,9 @@ public class LessonServiceTest {
 
         Assertions.assertEquals(2, lesson.getSteps().size());
 
-        // Verify Step 2 (order 1) comes first
         Assertions.assertEquals("02", lesson.getSteps().get(0).getId());
         Assertions.assertEquals("Step 2", lesson.getSteps().get(0).getTitle());
 
-        // Verify Step 1 (order 2) comes second
         Assertions.assertEquals("01", lesson.getSteps().get(1).getId());
         Assertions.assertEquals("Step 1", lesson.getSteps().get(1).getTitle());
     }
@@ -112,21 +111,16 @@ public class LessonServiceTest {
         Path lessonDir = tempDir.resolve("lessons/lesson-mixed");
         Files.createDirectories(lessonDir);
 
-        // Implicit order (should be MAX_VALUE, so sorted by ID at the end)
         Path stepA = lessonDir.resolve("a.md");
         Files.writeString(stepA, "---\ntitle: Step A\n---\n# Content A");
 
-        // Explicit order 1
         Path stepB = lessonDir.resolve("b.md");
         Files.writeString(stepB, "---\ntitle: Step B\norder: 1\n---\n# Content B");
 
-        // Implicit order (should be MAX_VALUE, so sorted by ID at the end)
         Path stepC = lessonDir.resolve("c.md");
         Files.writeString(stepC, "---\ntitle: Step C\n---\n# Content C");
 
-        // Initialize service
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -134,17 +128,13 @@ public class LessonServiceTest {
         Lesson lesson = lessons.get(0);
         Assertions.assertEquals(3, lesson.getSteps().size());
 
-        // B comes first (order 1)
         Assertions.assertEquals("b", lesson.getSteps().get(0).getId());
-
-        // A and C come after, sorted by ID (a then c)
         Assertions.assertEquals("a", lesson.getSteps().get(1).getId());
         Assertions.assertEquals("c", lesson.getSteps().get(2).getId());
     }
 
     @Test
     public void testLoadLessonsWithSections(@TempDir Path tempDir) throws IOException {
-        // Create a mock lesson structure
         Path lessonDir = tempDir.resolve("lessons/lesson-1");
         Files.createDirectories(lessonDir);
 
@@ -154,9 +144,7 @@ public class LessonServiceTest {
         Path step2 = lessonDir.resolve("step2.md");
         Files.writeString(step2, "---\ntitle: Step 2\nsection: Advanced\n---\n# Content");
 
-        // Initialize service pointing to temp dir
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, true, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -164,7 +152,6 @@ public class LessonServiceTest {
         Lesson lesson = lessons.get(0);
         Assertions.assertEquals(2, lesson.getSteps().size());
 
-        // Steps are sorted by ID (filename)
         Assertions.assertEquals("Step 1", lesson.getSteps().get(0).getTitle());
         Assertions.assertEquals("Basics", lesson.getSteps().get(0).getSection());
 
@@ -177,8 +164,7 @@ public class LessonServiceTest {
         Path lessonsDir = tempDir.resolve("lessons");
         Files.createDirectories(lessonsDir);
 
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertTrue(lessons.isEmpty());
@@ -195,11 +181,7 @@ public class LessonServiceTest {
         Path step1 = lessonDir.resolve("step1.md");
         Files.writeString(step1, "# Content");
 
-        // Mock production environment
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(true);
-
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false, false);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertTrue(lessons.isEmpty(), "Draft lesson should not be loaded in production");
@@ -216,11 +198,7 @@ public class LessonServiceTest {
         Path step1 = lessonDir.resolve("step1.md");
         Files.writeString(step1, "# Content");
 
-        // Mock dev environment (not production)
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
-
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, true, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size(), "Draft lesson SHOULD be loaded in non-production");
@@ -238,9 +216,7 @@ public class LessonServiceTest {
         Path step2 = lessonDir.resolve("02-draft.md");
         Files.writeString(step2, "---\ntitle: Draft Step\ndraft: true\n---\n# Draft Content");
 
-        // devMode = false
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
@@ -261,14 +237,96 @@ public class LessonServiceTest {
         Path step2 = lessonDir.resolve("02-draft.md");
         Files.writeString(step2, "---\ntitle: Draft Step\ndraft: true\n---\n# Draft Content");
 
-        // devMode = true
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), true, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, true, true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());
 
         Lesson lesson = lessons.get(0);
         Assertions.assertEquals(2, lesson.getSteps().size());
+    }
+
+    @Test
+    public void testFrontmatterOnly(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/fm-only");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        Files.writeString(step1, "---\ntitle: Only Metadata\n---");
+
+        LessonService service = createService(tempDir, false, true);
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
+
+        Lesson lesson = lessons.get(0);
+        Assertions.assertEquals(1, lesson.getSteps().size());
+
+        Step step = lesson.getSteps().get(0);
+        Assertions.assertEquals("Only Metadata", step.getTitle());
+        Assertions.assertEquals("", step.getContent());
+    }
+
+    @Test
+    public void testLoadLessonsWithInvalidFrontmatter(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/lesson-invalid");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        Files.writeString(step1, "---\ntitle: Invalid Step\norder: \"not-a-number\"\n---\n# Content");
+
+        // We expect ResourceLessonRepository init to throw RuntimeException
+        Assertions.assertThrows(RuntimeException.class, () -> createService(tempDir, true, true));
+    }
+
+    @Test
+    public void testLoadLessonsWithInvalidFrontmatterWarnOnly(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/lesson-invalid-warn");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        Files.writeString(step1, "---\ntitle: Invalid Step\norder: \"not-a-number\"\n---\n# Content");
+
+        LessonService service = createService(tempDir, false, false);
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
+    }
+
+    @Test
+    public void testLoadLessonsWithQuizzes(@TempDir Path tempDir) throws IOException {
+        Path lessonDir = tempDir.resolve("lessons/lesson-quiz");
+        Files.createDirectories(lessonDir);
+
+        Path step1 = lessonDir.resolve("step1.md");
+        String content = "---\n" +
+                "title: Step Quiz\n" +
+                "quizzes:\n" +
+                "  - question: 'What is 2+2?'\n" +
+                "    type: CHOICE\n" +
+                "    options:\n" +
+                "      - '3'\n" +
+                "      - '4'\n" +
+                "      - '5'\n" +
+                "    correctAnswer: '4'\n" +
+                "  - question: 'Type hello'\n" +
+                "    type: TEXT\n" +
+                "    validationRegex: '^hello$'\n" +
+                "---\n" +
+                "# Content";
+
+        Files.writeString(step1, content);
+
+        LessonService service = createService(tempDir, true, true);
+
+        List<Lesson> lessons = service.findAll();
+        Assertions.assertEquals(1, lessons.size());
+
+        Lesson lesson = lessons.get(0);
+        Step step = lesson.getSteps().get(0);
+
+        List<QuizQuestion> quizzes = step.getQuizzes();
+        Assertions.assertNotNull(quizzes);
+        Assertions.assertEquals(2, quizzes.size());
     }
 }

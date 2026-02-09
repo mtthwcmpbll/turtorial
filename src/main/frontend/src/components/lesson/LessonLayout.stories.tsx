@@ -14,7 +14,6 @@ const meta = {
         onPrev: { action: 'prev' },
         onNext: { action: 'next' },
         onSelectStep: { action: 'select step' },
-        onRunCommand: { action: 'run command' },
     },
 } satisfies Meta<typeof LessonLayout>;
 
@@ -26,10 +25,10 @@ const mockLesson: Lesson = {
     title: 'Comprehensive Shell Course',
     steps: [
         {
-            id: '1-1', title: 'Introduction', content: '# Welcome\n\nStart here.', runCommand: 'whoami'
+            id: '1-1', title: 'Introduction', content: '# Welcome\n\nStart here.'
         },
         {
-            id: '1-2', title: 'Files', content: '# Files\n\nLearn about files.', runCommand: 'ls'
+            id: '1-2', title: 'Files', content: '# Files\n\nLearn about files.'
         },
     ],
 };
@@ -43,6 +42,5 @@ export const Default: Story = {
         onPrev: () => { },
         onNext: () => { },
         onSelectStep: () => { },
-        onRunCommand: () => { },
     },
 };

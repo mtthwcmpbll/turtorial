@@ -1,9 +1,9 @@
 package com.snowfort.turtorial.service;
 
 import com.snowfort.turtorial.model.Lesson;
+import com.snowfort.turtorial.repository.ResourceLessonRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
@@ -11,18 +11,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
-import static org.mockito.Mockito.*;
-
 public class LessonScriptsTest {
 
-    private Environment mockEnv;
-
-    @BeforeEach
-    public void setup() {
-        mockEnv = mock(Environment.class);
-        when(mockEnv.acceptsProfiles(Profiles.of("prod"))).thenReturn(false);
+    private LessonService createService(Path tempDir, boolean environmentScriptsEnabled) {
+        LessonParser parser = new LessonParser(true);
+        parser.init();
+        ResourceLessonRepository repo = new ResourceLessonRepository(
+                parser,
+                tempDir.resolve("lessons").toUri().toString(),
+                true, // devMode
+                true // failOnError
+        );
+        repo.init();
+        return new LessonService(repo, new ShellCommandExecutor(), environmentScriptsEnabled);
     }
 
     @Test
@@ -41,23 +42,22 @@ public class LessonScriptsTest {
         Files.writeString(step1, content);
 
         // Disable scripts
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, false, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, false);
 
         List<Lesson> lessons = service.findAll();
         Lesson lesson = lessons.get(0);
         String lessonId = lesson.getId();
         String stepId = lesson.getSteps().get(0).getId();
 
-        // Run prepare
-        boolean result = service.prepareStep(lessonId, stepId);
+        // Run prepare (runBeforeStep)
+        boolean result = service.runBeforeStep(lessonId, stepId);
         Assertions.assertTrue(result);
         Assertions.assertFalse(Files.exists(targetFile), "File should NOT be created when scripts are disabled");
 
-        // Run cleanup
+        // Run cleanup (runAfterStep)
         // Create file manually to check if it gets deleted (it shouldn't)
         Files.createFile(targetFile);
-        result = service.cleanupStep(lessonId, stepId);
+        result = service.runAfterStep(lessonId, stepId);
         Assertions.assertTrue(result);
         Assertions.assertTrue(Files.exists(targetFile), "File should NOT be deleted when scripts are disabled");
     }
@@ -78,21 +78,20 @@ public class LessonScriptsTest {
         Files.writeString(step1, content);
 
         // Enable scripts
-        LessonService service = new LessonService(tempDir.resolve("lessons").toUri().toString(), false, true, mockEnv);
-        service.init();
+        LessonService service = createService(tempDir, true);
 
         List<Lesson> lessons = service.findAll();
         Lesson lesson = lessons.get(0);
         String lessonId = lesson.getId();
         String stepId = lesson.getSteps().get(0).getId();
 
-        // Run prepare
-        boolean result = service.prepareStep(lessonId, stepId);
+        // Run prepare (runBeforeStep)
+        boolean result = service.runBeforeStep(lessonId, stepId);
         Assertions.assertTrue(result);
         Assertions.assertTrue(Files.exists(targetFile), "File SHOULD be created when scripts are enabled");
 
-        // Run cleanup
-        result = service.cleanupStep(lessonId, stepId);
+        // Run cleanup (runAfterStep)
+        result = service.runAfterStep(lessonId, stepId);
         Assertions.assertTrue(result);
         Assertions.assertFalse(Files.exists(targetFile), "File SHOULD be deleted when scripts are enabled");
     }

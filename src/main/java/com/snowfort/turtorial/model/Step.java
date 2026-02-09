@@ -4,12 +4,12 @@ public class Step {
     private String id;
     private String title;
     private String content;
-    private String runCommand;
     private String testCommand;
-    private String before;
-    private String after;
+    private String beforeCommand;
+    private String afterCommand;
     private Integer order;
     private String section;
+    private java.util.List<QuizQuestion> quizzes;
 
     public String getId() {
         return id;
@@ -35,14 +35,6 @@ public class Step {
         this.content = content;
     }
 
-    public String getRunCommand() {
-        return runCommand;
-    }
-
-    public void setRunCommand(String runCommand) {
-        this.runCommand = runCommand;
-    }
-
     public String getTestCommand() {
         return testCommand;
     }
@@ -51,20 +43,20 @@ public class Step {
         this.testCommand = testCommand;
     }
 
-    public String getBefore() {
-        return before;
+    public String getBeforeCommand() {
+        return beforeCommand;
     }
 
-    public void setBefore(String before) {
-        this.before = before;
+    public void setBeforeCommand(String beforeCommand) {
+        this.beforeCommand = beforeCommand;
     }
 
-    public String getAfter() {
-        return after;
+    public String getAfterCommand() {
+        return afterCommand;
     }
 
-    public void setAfter(String after) {
-        this.after = after;
+    public void setAfterCommand(String afterCommand) {
+        this.afterCommand = afterCommand;
     }
 
     public Integer getOrder() {
@@ -81,5 +73,13 @@ public class Step {
 
     public void setSection(String section) {
         this.section = section;
+    }
+
+    public java.util.List<QuizQuestion> getQuizzes() {
+        return quizzes;
+    }
+
+    public void setQuizzes(java.util.List<QuizQuestion> quizzes) {
+        this.quizzes = quizzes;
     }
 }
