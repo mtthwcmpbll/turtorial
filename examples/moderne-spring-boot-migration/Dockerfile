@@ -79,5 +79,5 @@ COPY --chown=turtorial:turtorial lessons /app/lessons
 
 WORKDIR /home/turtorial
 
-# Run the application (using Java 25 from the base image location)
-ENTRYPOINT ["/opt/java/openjdk/bin/java", "-jar", "/app/turtorial.jar"]
+# Run the application
+ENTRYPOINT ["/app/turtorial"]
