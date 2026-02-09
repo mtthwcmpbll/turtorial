@@ -1,6 +1,8 @@
 fileignoreconfig:
+- filename: .github/workflows/manual-publish-image.yml
+  checksum: 3eec99c37eae7cbd91743e7b266570b8be0c69b060abbd92951ae2383778cf3a
 - filename: .github/workflows/release.yml
-  checksum: 5fc68c655ea8e84be2711ce3aef887505c98b1b0fb62f4cda642c8aaf7a7039a
+  checksum: cb5291091a8847e40b2f2050c5530c68f41255e9f59631ce03055ca746626070
 - filename: backend.log
   checksum: 0181e4eeae0ab15fe8369040796ba9fd135bbe90e7bd1f3e31fff736e0175c12
 - filename: src/main/frontend/package-lock.json
