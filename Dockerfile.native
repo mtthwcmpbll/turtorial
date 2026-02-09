@@ -1,0 +1,75 @@
+# Build arg to select binary source: "build" (compile from source) or "prebuilt" (use pre-built binary)
+ARG BINARY=build
+
+# Builder stage — compiles native image from source (local dev, default)
+FROM ghcr.io/graalvm/native-image-community:25 AS build
+WORKDIR /build
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline -B
+COPY src src
+RUN ./mvnw clean package -Pnative,prod -DskipTests && cp target/turtorial /turtorial
+
+# Prebuilt stage — copies binary from build context (CI)
+FROM scratch AS prebuilt
+COPY target/turtorial /turtorial
+
+# Select binary source based on ARG (BuildKit skips unused stages)
+FROM ${BINARY} AS binary
+
+# Runtime base image with tools for the tutorial environment
+FROM ubuntu:24.04 AS base
+
+# Set install locations
+ENV JAVA_HOME=/opt/java/openjdk
+ENV MAVEN_HOME=/opt/maven
+ENV GRADLE_HOME=/opt/gradle
+
+# Update PATH
+ENV PATH=$JAVA_HOME/bin:$MAVEN_HOME/bin:$GRADLE_HOME/bin:$PATH
+
+# Install base dependencies
+# - git, bash, jq, curl, wget, zip, unzip, vim, nano: Common tools for the terminal environment
+RUN apt-get update && apt-get install -y \
+    git \
+    bash \
+    jq \
+    curl \
+    wget \
+    zip \
+    unzip \
+    vim \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM base AS platform
+
+# Create the turtorial user
+RUN useradd -m -s /bin/bash turtorial
+
+RUN mkdir -p /home/turtorial/.ssh \
+    && chown -R turtorial:turtorial /home/turtorial/.ssh
+
+# Create app directory
+WORKDIR /app
+
+# Copy the native binary from the selected source
+COPY --from=binary /turtorial /app/turtorial
+
+# Change ownership of the app directory
+RUN chown -R turtorial:turtorial /app
+
+# Switch to the new user
+USER turtorial
+
+# Set the working directory to the user's home
+WORKDIR /home/turtorial
+
+# Expose the application port
+EXPOSE 8080
+
+# Create the lessons directory
+RUN mkdir -p /app/lessons
+
+# Run the application
+ENTRYPOINT ["/app/turtorial"]

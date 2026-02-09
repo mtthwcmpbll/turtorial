@@ -12,16 +12,13 @@ public class LessonService {
 
     private final LessonRepository lessonRepository;
     private final CommandExecutor commandExecutor;
+    private final boolean environmentScriptsEnabled;
 
-    public LessonService(LessonRepository lessonRepository, CommandExecutor commandExecutor) {
+    public LessonService(LessonRepository lessonRepository, CommandExecutor commandExecutor,
+            @org.springframework.beans.factory.annotation.Value("${turtorial.lessons.environmentScripts.enabled:false}") boolean environmentScriptsEnabled) {
         this.lessonRepository = lessonRepository;
         this.commandExecutor = commandExecutor;
-    }
-
-    // Deprecated: Only used for tests that haven't been migrated yet to use Repository directly
-    // Ideally this should be removed and tests updated to use Repository or mocked properly
-    public void init() {
-       // No-op as repository initializes itself
+        this.environmentScriptsEnabled = environmentScriptsEnabled;
     }
 
     public List<Lesson> findAll() {
@@ -43,6 +40,9 @@ public class LessonService {
     }
 
     public boolean runBeforeStep(String lessonId, String stepId) {
+        if (!environmentScriptsEnabled) {
+            return true;
+        }
         Step step = findStep(lessonId, stepId);
 
         if (step == null || step.getBeforeCommand() == null || step.getBeforeCommand().isEmpty()) {
@@ -53,6 +53,9 @@ public class LessonService {
     }
 
     public boolean runAfterStep(String lessonId, String stepId) {
+        if (!environmentScriptsEnabled) {
+            return true;
+        }
         Step step = findStep(lessonId, stepId);
 
         if (step == null || step.getAfterCommand() == null || step.getAfterCommand().isEmpty()) {

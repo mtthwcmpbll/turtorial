@@ -6,6 +6,8 @@ turtorial:
   dev-mode: true
   lessons:
     directory: classpath:/lessons
+    environmentScripts:
+      enabled: false
     frontmatter:
       validation:
         fail-on-error: true
