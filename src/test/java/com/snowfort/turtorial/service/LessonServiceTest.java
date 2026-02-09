@@ -32,10 +32,9 @@ public class LessonServiceTest {
                 parser, // Create fresh parser with config
                 tempDir.resolve("lessons").toUri().toString(),
                 devMode,
-                failOnError
-        );
+                failOnError);
         repo.init();
-        return new LessonService(repo, new ShellCommandExecutor());
+        return new LessonService(repo, new ShellCommandExecutor(), false);
     }
 
     @Test

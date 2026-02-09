@@ -40,7 +40,7 @@ public class LessonServiceBlockingTest {
                 false);
         repo.init();
 
-        LessonService service = new LessonService(repo, new ShellCommandExecutor());
+        LessonService service = new LessonService(repo, new ShellCommandExecutor(), false);
 
         Assertions.assertFalse(service.findAll().isEmpty(), "Lesson should be loaded");
         String lessonId = service.findAll().get(0).getId();

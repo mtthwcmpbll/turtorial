@@ -35,7 +35,7 @@ public class LessonServiceCommandTest {
                 true);
         repo.init();
 
-        LessonService service = new LessonService(repo, new ShellCommandExecutor());
+        LessonService service = new LessonService(repo, new ShellCommandExecutor(), true);
 
         List<Lesson> lessons = service.findAll();
         Assertions.assertEquals(1, lessons.size());

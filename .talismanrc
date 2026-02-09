@@ -4,15 +4,17 @@ fileignoreconfig:
 - filename: backend.log
   checksum: 0181e4eeae0ab15fe8369040796ba9fd135bbe90e7bd1f3e31fff736e0175c12
 - filename: src/main/frontend/package-lock.json
-  checksum: a5cd701af4f4b1226638a70afd6bb943d350c6805875033bec37ab9c330ac723
+  checksum: ac1fc385f150f18f831e4480fc959cfab031a45a362ab615b237016f011b5a69
 - filename: src/main/frontend/src/components/lesson-list/LessonListView.tsx
   checksum: 8ee7751883a36a60d99c450e05425792c8702e218d7c34684ef0db21e57e9657
 - filename: src/main/frontend/src/components/lesson/ContentSection.tsx
-  checksum: 6bf72d4b1c6a2449cb1a2f2adf506d461bd7731c9e759c2351bdda05b07ae2c0
+  checksum: fb36f15d8f1d5ab967bdd2ee818d6847f713154700c8bf5aa7c9af407231b781
 - filename: src/main/frontend/src/components/lesson/QuizComponent.tsx
   checksum: e335fb7a23e6c63a693999aaf8919312184acd682fc17cb96f1841d2a334addc
+- filename: src/main/frontend/src/components/lesson/TabbedPane.tsx
+  checksum: 90b266c181affd0a77eae7df1d06301db01c49d26084af4ab3ed4c64f636c1cb
 - filename: src/main/frontend/src/components/lesson/TerminalPanel.tsx
   checksum: 5bbc0899eb813ce0045f6e29cd0b55d15427f5d44fcf5b16f4357085ee60dba0
 - filename: src/test/java/com/snowfort/turtorial/service/LessonServiceBlockingTest.java
-  checksum: f67453d0a095e386898f4d8556a0f9a202e58ef9152a51b7cf28dbc1c1ed3268
+  checksum: afc697a14f88d38eddb8cd4be9c609d16cb47133475b346af30d482a1bd58f8f
 version: "1.0"
