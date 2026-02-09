@@ -172,6 +172,9 @@
                         </executions>
                         <configuration>
                             <imageName>turtorial</imageName>
+                            <buildArgs>
+                                <buildArg>--initialize-at-build-time=jtermios.linux.JTermiosImpl$Linux_C_lib_DirectMapping</buildArg>
+                            </buildArgs>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -262,23 +265,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>native</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <configuration>
-                            <imageName>turtorial</imageName>
-                            <buildArgs>
-                                <buildArg>--initialize-at-build-time=jtermios.linux.JTermiosImpl$Linux_C_lib_DirectMapping</buildArg>
-                            </buildArgs>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

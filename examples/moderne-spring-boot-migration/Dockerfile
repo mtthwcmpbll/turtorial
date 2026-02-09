@@ -13,14 +13,14 @@ FROM turtorial:latest AS base
 
 USER root
 
-# Install Temurin JDK 17 (needed for Spring Boot 2.7 migration workshop)
-# Note: turtorial:latest installs Java 25 to /opt/java/openjdk
-RUN mkdir -p /opt/java/openjdk17 \
-    && curl -L "https://api.adoptium.net/v3/binary/latest/17/ga/linux/aarch64/jdk/hotspot/normal/eclipse" | tar -xz -C /opt/java/openjdk17 --strip-components=1
+# # Install Temurin JDK 17 (needed for Spring Boot 2.7 migration workshop)
+# # Note: turtorial:latest installs Java 25 to /opt/java/openjdk
+# RUN mkdir -p /opt/java/openjdk17 \
+#     && curl -L "https://api.adoptium.net/v3/binary/latest/17/ga/linux/aarch64/jdk/hotspot/normal/eclipse" | tar -xz -C /opt/java/openjdk17 --strip-components=1
 
-# Set JAVA_HOME to Java 17 for the workshop exercises
-ENV JAVA_HOME=/opt/java/openjdk17
-ENV PATH=$JAVA_HOME/bin:$PATH
+# # Set JAVA_HOME to Java 17 for the workshop exercises
+# ENV JAVA_HOME=/opt/java/openjdk17
+# ENV PATH=$JAVA_HOME/bin:$PATH
 
 ARG MODERNE_CLI_STAGE=stable
 ARG MODERNE_CLI_VERSION
@@ -79,5 +79,8 @@ COPY --chown=turtorial:turtorial lessons /app/lessons
 
 WORKDIR /home/turtorial
 
+ENV SPRING_PROFILES_ACTIVE=prod
+
 # Run the application
-ENTRYPOINT ["/app/turtorial"]
+# ENTRYPOINT ["/app/turtorial"]
+ENTRYPOINT ["java", "-jar", "/app/turtorial.jar"]
