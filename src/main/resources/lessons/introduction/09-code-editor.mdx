@@ -1,0 +1,42 @@
+---
+title: "The Code Editor"
+description: "Learn how to use the built-in Monaco code editor in your tutorials."
+section: "Features"
+order: 9
+---
+
+# The Code Editor
+
+Turtorial includes a powerful, web-based code editor (based on Monaco, the engine behind VS Code) that you can embed directly into your lessons. This allows learners to view and edit files without leaving the browser environment.
+
+## Opening a File
+
+To open a file in the editor, use the `:::editor` directive in your Markdown content. This renders a button that, when clicked, opens the specified file in a new tab.
+
+### Syntax
+
+```markdown
+:::editor filename
+```
+
+### Example
+
+Click the button below to open a sample file (if it exists in the working directory):
+
+:::editor README.md
+
+## How it Works
+
+1.  **Directive:** When you use `:::editor path/to/file.txt`, Turtorial renders a button labeled `Open path/to/file.txt in editor`.
+2.  **Action:** Clicking the button opens a new tab in the right-hand pane.
+3.  **Content:** The editor fetches the content of the file from the server.
+4.  **Saving:** You can save changes by pressing `Ctrl+S` (or `Cmd+S` on macOS) or clicking the **Save** button in the editor toolbar.
+
+## Best Practices
+
+*   **File Existence:** Ensure the file you are linking to exists in the working directory or is created by a previous step (e.g., using a `runCommand` or a `cat` block).
+*   **Pathing:** Paths are relative to the application's working directory. Use relative paths carefully.
+*   **Context:** Explain *why* the user needs to edit the file and *what* changes they should make.
+
+> [!TIP]
+> You can combine the editor with `runCommand` steps. For example, have the user edit a configuration file, then provide a run button to restart a service and apply the changes.

@@ -131,6 +131,10 @@ Open your browser to `http://localhost:8080` to see your lesson in action!
 
 We love contributions! If you're a developer looking to improve the platform itself (the Java backend or React frontend), check out [BUILDING.md](BUILDING.md) for technical build instructions.
 
+## 🤖 Agentic Workflow
+
+If you are an AI agent or using AI tools to contribute to this project, please refer to [AGENTS.md](AGENTS.md) for specific instructions and guidelines. This file serves as the source of truth for all agentic workflows.
+
 ## 📄 License
 
 [MIT License](LICENSE)
