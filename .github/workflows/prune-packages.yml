@@ -1,0 +1,68 @@
+name: Prune Packages
+
+# Reclaims GHCR storage by deleting throwaway dev builds and the manifests
+# they leave behind.
+#
+# NOTE: do not swap this for `actions/delete-package-versions` with
+# `delete-only-untagged-versions: true`. Every multi-arch tag published by
+# release.yml is an OCI index whose per-platform and attestation manifests show
+# up in the packages API as *untagged* versions. Deleting all untagged versions
+# breaks `docker pull` for the releases that point at them. The script here
+# resolves manifest references first and only deletes what nothing reachable
+# from a surviving tag points to.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report what would be deleted without deleting it'
+        required: true
+        default: true
+        type: boolean
+      prune_sha_tags:
+        description: 'Also delete commit-SHA dev builds (releases and latest are always kept)'
+        required: true
+        default: true
+        type: boolean
+      keep_days:
+        description: 'Never delete anything newer than this many days'
+        required: true
+        default: '30'
+        type: string
+      package:
+        description: 'Container package to prune'
+        required: true
+        default: 'turtorial'
+        type: string
+  schedule:
+    # Weekly, Sunday 06:00 UTC. Scheduled runs delete for real; keep_days is
+    # the safety net that protects anything built in the last 30 days.
+    - cron: '0 6 * * 0'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Prune container versions
+        env:
+          # GITHUB_TOKEN cannot always delete package versions. If the run
+          # fails with 403, add a classic PAT with `delete:packages` as the
+          # PACKAGES_TOKEN secret and it will be used instead.
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          PACKAGE: ${{ inputs.package || 'turtorial' }}
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+          PRUNE_SHA_TAGS: ${{ github.event_name == 'schedule' && 'true' || inputs.prune_sha_tags }}
+          KEEP_DAYS: ${{ inputs.keep_days || '30' }}
+        run: python .github/workflows/scripts/prune-ghcr-untagged.py
