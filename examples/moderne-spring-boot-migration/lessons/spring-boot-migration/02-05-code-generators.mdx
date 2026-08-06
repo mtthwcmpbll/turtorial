@@ -1,0 +1,22 @@
+---
+title: Locate Code Generators
+section: Assessment
+order: 9
+---
+# Exercise 5: Locate Code Generators (QueryDSL)
+
+Code generators like QueryDSL can be major blockers. Let's find where they are used.
+
+```bash
+mod run $WORKSPACE --recipe org.openrewrite.maven.search.FindPlugin --dry-run \
+  --recipe-option groupId=com.mysema.maven \
+  --recipe-option artifactId=apt-maven-plugin
+```
+
+Check the results:
+
+```bash
+mod study $WORKSPACE --last-recipe-run --data-table org.openrewrite.maven.table.SearchResults
+```
+
+You should see usage in several services.

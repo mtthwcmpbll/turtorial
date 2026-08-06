@@ -1,0 +1,21 @@
+---
+title: Inspect Spring Boot Version
+section: Assessment
+order: 7
+---
+# Exercise 3: Inspect Spring Boot Versions
+
+Now, let's find out which Spring Boot versions are currently used.
+
+```bash
+mod run $WORKSPACE --recipe org.openrewrite.java.dependencies.DependencyInsight --dry-run \
+  --recipe-option groupPattern=org.springframework.boot \
+  --recipe-option artifactPattern=* \
+  --recipe-option scope=runtime
+```
+
+Check the results:
+
+```bash
+mod study $WORKSPACE --last-recipe-run --data-table org.openrewrite.maven.table.DependenciesInUse
+```

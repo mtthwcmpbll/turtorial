@@ -136,10 +136,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -176,6 +172,9 @@
                         </executions>
                         <configuration>
                             <imageName>turtorial</imageName>
+                            <buildArgs>
+                                <buildArg>--initialize-at-build-time=jtermios.linux.JTermiosImpl$Linux_C_lib_DirectMapping</buildArg>
+                            </buildArgs>
                         </configuration>
                     </plugin>
                 </plugins>

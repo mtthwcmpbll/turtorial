@@ -1,0 +1,11 @@
+[
+  {
+    "interfaces": ["com.pty4j.unix.linux.OSFacadeImpl$C_lib"]
+  },
+  {
+    "interfaces": ["com.pty4j.unix.linux.OSFacadeImpl$Linux_Util_lib"]
+  },
+  {
+    "interfaces": ["jtermios.linux.JTermiosImpl$Linux_C_lib"]
+  }
+]

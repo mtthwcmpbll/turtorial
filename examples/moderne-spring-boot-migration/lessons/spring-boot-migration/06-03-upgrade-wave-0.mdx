@@ -1,0 +1,25 @@
+---
+title: Upgrade Wave 0
+section: Finish Migration
+order: 25
+---
+# Exercise 3: Upgrade Wave 0
+
+Run the custom recipe on Wave 0:
+
+```bash
+mod run $WORKSPACE/Wave0 --recipe org.openrewrite.recipe.querydsl.CustomUpgradeSpringBoot_4_0
+```
+
+Apply the changes:
+
+```bash
+mod git apply $WORKSPACE/Wave0 --last-recipe-run
+```
+
+Build and release Wave 0:
+
+```bash
+$WORKSHOP/build.sh 0
+$WORKSHOP/release.sh 0
+```

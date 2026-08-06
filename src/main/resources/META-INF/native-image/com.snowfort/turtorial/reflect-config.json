@@ -1,0 +1,119 @@
+[
+  {
+    "name": "jtermios.linux.JTermiosImpl$Linux_C_lib_DirectMapping",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl$Linux_C_lib",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl$Linux_C_lib$termios",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl$Linux_C_lib$serial_struct",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl$Linux_C_lib$timeval",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl$Linux_C_lib$pollfd",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl$FDSetImpl",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.linux.JTermiosImpl",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jtermios.JTermios",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.pty4j.unix.linux.OSFacadeImpl",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.pty4j.unix.linux.OSFacadeImpl$C_lib",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.pty4j.unix.linux.OSFacadeImpl$Linux_Util_lib",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.pty4j.unix.PtyHelpers",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.pty4j.unix.PtyHelpers$OSFacade",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.pty4j.unix.Pty",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.pty4j.unix.UnixPtyProcess",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.pty4j.PtyProcessBuilder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.sun.jna.Structure",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.sun.jna.Pointer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.sun.jna.NativeLong",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.sun.jna.ptr.IntByReference",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  }
+]

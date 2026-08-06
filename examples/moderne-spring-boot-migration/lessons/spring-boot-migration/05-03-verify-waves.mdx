@@ -1,0 +1,20 @@
+---
+title: Verify Waves
+section: Smoke Test
+order: 20
+---
+# Exercise 3: Build Waves (Expect Failure)
+
+Let's try to build Wave 0 and Wave 1.
+
+```bash
+$WORKSHOP/build.sh 0
+```
+
+Wave 0 (common libraries) should build successfully.
+
+```bash
+$WORKSHOP/build.sh 1
+```
+
+Wave 1 is expected to fail. Why? Because of QueryDSL issues! We'll fix this in the next module.

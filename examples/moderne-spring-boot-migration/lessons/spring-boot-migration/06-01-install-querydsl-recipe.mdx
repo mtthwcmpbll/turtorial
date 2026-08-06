@@ -1,0 +1,25 @@
+---
+title: Install QueryDSL Recipe
+section: Finish Migration
+order: 23
+---
+# Exercise 1: Install the QueryDSL Recipe
+
+In this module, you will install a custom recipe to handle the QueryDSL issues, build a composite upgrade recipe, and upgrade each wave of repositories to Spring Boot 4.
+
+We need a custom recipe to rename packages and update dependencies for QueryDSL.
+
+Clone the custom recipe repository:
+
+```bash
+cd $PROJECTS
+git clone https://github.com/modernetraining/rewrite-querydsl.git
+```
+
+Build and install it locally:
+
+```bash
+cd rewrite-querydsl
+mvn clean install
+mod config recipes jar install org.openrewrite.recipe:rewrite-querydsl:0.1.0-SNAPSHOT
+```
