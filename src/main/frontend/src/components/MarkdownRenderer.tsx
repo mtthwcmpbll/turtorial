@@ -4,6 +4,7 @@ import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import remarkDirective from 'remark-directive';
 import { visit } from 'unist-util-visit';
+import { FileCode } from 'lucide-react';
 import 'highlight.js/styles/github-dark.css';
 
 import CodeBlock from './lesson/CodeBlock';
@@ -29,6 +30,18 @@ function remarkAdmonitions() {
                         "data-admonition-title": (node.attributes && node.attributes.title) ? node.attributes.title : undefined,
                     };
                 }
+            }
+            if (node.type === 'leafDirective') {
+                 if (node.name === 'editor') {
+                    const data = node.data || (node.data = {});
+                    const tagName = 'div';
+                    data.hName = tagName;
+                    data.hProperties = {
+                        className: "editor-directive",
+                        "data-admonition-type": "editor",
+                        "data-admonition-title": (node.attributes && node.attributes.title) ? node.attributes.title : undefined,
+                    };
+                 }
             }
         });
     };
@@ -72,10 +85,26 @@ const COMPONENTS: React.ComponentProps<typeof Markdown>['components'] = {
     // Custom rendering for directives (Admonitions)
     div: ({ node, className, children, ...props }) => {
         const type = props['data-admonition-type' as keyof typeof props] as string;
+
+        if (type === 'editor') {
+             const file = props['data-admonition-title' as keyof typeof props] as string;
+             return (
+                 <div className="my-4">
+                     <button
+                         onClick={() => window.dispatchEvent(new CustomEvent('editor:open', { detail: file }))}
+                         className="flex items-center gap-2 px-3 py-2 bg-[#252526] hover:bg-[#2a2d2e] border border-white/10 rounded text-sm text-gray-300 hover:text-white transition-colors cursor-pointer group"
+                         title={`Open ${file} in editor`}
+                     >
+                         <FileCode size={16} className="text-blue-400 group-hover:text-blue-300" />
+                         <span className="font-mono">{file}</span>
+                     </button>
+                 </div>
+             );
+        }
+
         if (type) {
             const title = props['data-admonition-title' as keyof typeof props] as string;
             return (
-                // Cast type to AdmonitionType because we know it's one of the allowed strings if logic allows
                 <Admonition type={type as AdmonitionType} title={title}>
                     {children}
                 </Admonition>
@@ -140,7 +169,10 @@ const COMPONENTS: React.ComponentProps<typeof Markdown>['components'] = {
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     // Pre-process content to support ":::note Title" syntax by converting it to ":::note{title="Title"}"
     const normalizedContent = useMemo(() => {
-        return content.replace(/^:::(note|tip|warning|important|caution)\s+(.+)$/gm, ':::$1{title="$2"}');
+        let newContent = content.replace(/^:::(note|tip|warning|important|caution)\s+(.+)$/gm, ':::$1{title="$2"}');
+        // Convert :::editor filename to ::editor{title="filename"} (leaf directive)
+        newContent = newContent.replace(/^:::editor\s+(.+)$/gm, '::editor{title="$1"}');
+        return newContent;
     }, [content]);
 
     return (

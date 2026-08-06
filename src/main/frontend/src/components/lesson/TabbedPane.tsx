@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Terminal, Plus, X, Globe } from 'lucide-react';
+import { Terminal, Plus, X, Globe, FileCode } from 'lucide-react';
 import TerminalPanel from './TerminalPanel';
 import BrowserPanel from './BrowserPanel';
+import EditorPanel from './EditorPanel';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,7 +14,7 @@ function cn(...inputs: ClassValue[]) {
 
 interface Tab {
     id: string;
-    type: 'terminal' | 'browser';
+    type: 'terminal' | 'browser' | 'editor';
     title: string;
     url?: string;
 }
@@ -34,14 +35,17 @@ export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
     const tabsRef = useRef(tabs);
     const activeTabIdRef = useRef(activeTabId);
 
+    const addTab = useCallback((type: 'terminal' | 'browser' | 'editor', url?: string) => {
+        const id = `${type}-${Date.now()}`;
+        let title = '';
+        if (type === 'terminal') title = 'Terminal';
+        else if (type === 'browser') title = 'Browser';
+        else if (type === 'editor') title = url ? url.split('/').pop() || 'Editor' : 'Editor';
 
-
-    const addTab = useCallback((type: 'terminal' | 'browser', url?: string) => {
-        const id = `${type === 'terminal' ? 'term' : 'browser'}-${Date.now()}`;
         const newTab: Tab = {
             id,
             type,
-            title: type === 'terminal' ? 'Terminal' : 'Browser',
+            title,
             url
         };
         setTabs(prev => {
@@ -74,6 +78,22 @@ export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
         e.stopImmediatePropagation();
         const customEvent = e as CustomEvent;
         addTab('browser', customEvent.detail);
+    }, [addTab]);
+
+    const handleEditorOpen = useCallback((e: Event) => {
+        e.stopImmediatePropagation();
+        const customEvent = e as CustomEvent;
+        const filePath = customEvent.detail;
+
+        // Check if tab already exists for this file
+        const currentTabs = tabsRef.current;
+        const existingTab = currentTabs.find(t => t.type === 'editor' && t.url === filePath);
+
+        if (existingTab) {
+            setActiveTabId(existingTab.id);
+        } else {
+            addTab('editor', filePath);
+        }
     }, [addTab]);
 
     const handleRunCommand = useCallback((e: Event) => {
@@ -115,12 +135,14 @@ export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
     useEffect(() => {
         window.addEventListener('browser:open', handleBrowserOpen);
         window.addEventListener('terminal:run-command', handleRunCommand);
+        window.addEventListener('editor:open', handleEditorOpen);
 
         return () => {
             window.removeEventListener('browser:open', handleBrowserOpen);
             window.removeEventListener('terminal:run-command', handleRunCommand);
+            window.removeEventListener('editor:open', handleEditorOpen);
         };
-    }, [handleBrowserOpen, handleRunCommand]);
+    }, [handleBrowserOpen, handleRunCommand, handleEditorOpen]);
 
     return (
         <Tabs.Root
@@ -144,7 +166,9 @@ export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
                             )}
                         >
                             <div className="flex items-center gap-2 overflow-hidden">
-                                {tab.type === 'terminal' ? <Terminal size={14} className="shrink-0" /> : <Globe size={14} className="shrink-0" />}
+                                {tab.type === 'terminal' ? <Terminal size={14} className="shrink-0" /> :
+                                 tab.type === 'browser' ? <Globe size={14} className="shrink-0" /> :
+                                 <FileCode size={14} className="shrink-0" />}
                                 <span className="truncate">{tab.title}</span>
                             </div>
                             <div
@@ -221,6 +245,7 @@ export default function TabbedPane({ initialTabs }: TabbedPaneProps = {}) {
                     >
                         {tab.type === 'terminal' && <TerminalPanel onOpenUrl={(url) => addTab('browser', url)} />}
                         {tab.type === 'browser' && <BrowserPanel initialUrl={tab.url} />}
+                        {tab.type === 'editor' && <EditorPanel initialPath={tab.url} />}
                     </Tabs.Content>
                 ))}
             </div>
